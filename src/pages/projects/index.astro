@@ -1,0 +1,21 @@
+---
+import Base from "~/layouts/Base.astro";
+import ProjectCard from "~/components/ProjectCard.astro";
+import { loadAll } from "~/lib/manifests";
+
+const projects = await loadAll();
+projects.sort((a, b) => (b.updated ?? "").localeCompare(a.updated ?? ""));
+---
+
+<Base title="Projects — Luke Sarfas">
+  <h1>Projects</h1>
+  <p class="muted">Pulled live from each project's manifest at build time.</p>
+
+  {projects.length === 0 ? (
+    <p class="muted" style="margin-top:1.5rem">Nothing here yet.</p>
+  ) : (
+    <div class="grid">
+      {projects.map((p) => <ProjectCard project={p} />)}
+    </div>
+  )}
+</Base>

@@ -1,0 +1,28 @@
+# Example: drop this file into any sub-project repo so it pings the website to
+# rebuild whenever the project's manifest changes. Requires a repo secret named
+# WEBSITE_DISPATCH_TOKEN — a fine-grained PAT with `Contents: read & write` on
+# the luke.sarfas.com repo (used to call the dispatch API).
+#
+# Save as: .github/workflows/notify-website.yml in the SUB-PROJECT.
+
+name: Notify website
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "public/manifest.json"
+      - "manifest.json"
+  workflow_dispatch: {}
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger website rebuild
+        run: |
+          curl -fsSL -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.WEBSITE_DISPATCH_TOKEN }}" \
+            https://api.github.com/repos/lukesarfas/luke.sarfas.com/dispatches \
+            -d '{"event_type":"project-updated","client_payload":{"project":"${{ github.repository }}"}}'

@@ -1,0 +1,16 @@
+---
+const path = Astro.url.pathname;
+function active(p: string) {
+  if (p === "/") return path === "/";
+  return path.startsWith(p);
+}
+---
+
+<nav class="top">
+  <a href="/" style="font-weight:600">luke.sarfas.com</a>
+  <div>
+    <a href="/" style={active("/") && !active("/projects") && !active("/contact") ? "color:var(--accent)" : ""}>Home</a>
+    <a href="/projects" style={active("/projects") ? "color:var(--accent)" : ""}>Projects</a>
+    <a href="/contact" style={active("/contact") ? "color:var(--accent)" : ""}>Contact</a>
+  </div>
+</nav>

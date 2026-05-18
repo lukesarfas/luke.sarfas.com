@@ -1,0 +1,29 @@
+---
+import Base from "~/layouts/Base.astro";
+import ProjectCard from "~/components/ProjectCard.astro";
+import { loadAll } from "~/lib/manifests";
+
+const projects = await loadAll();
+const featured = projects.slice(0, 6);
+---
+
+<Base title="Luke Sarfas">
+  <h1>Hey, I'm Luke.</h1>
+  <p class="muted">
+    I build things and write about them. Here's what I'm working on right now.
+  </p>
+
+  {featured.length === 0 ? (
+    <p class="muted" style="margin-top:1.5rem">
+      No projects registered yet. Add entries to <code>src/data/projects.json</code>.
+    </p>
+  ) : (
+    <div class="grid">
+      {featured.map((p) => <ProjectCard project={p} />)}
+    </div>
+  )}
+
+  <p style="margin-top:2rem">
+    <a href="/projects">See all projects →</a>
+  </p>
+</Base>
