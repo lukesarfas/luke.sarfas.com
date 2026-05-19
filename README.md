@@ -2,7 +2,7 @@
 
 Personal hub site. Aggregates manifests from my projects and renders them as
 cards + detail pages. Static, built with [Astro](https://astro.build), hosted
-on Firebase Hosting under the `luke-personal` GCP project.
+on Firebase Hosting under the `luke-sarfas-personal` GCP project.
 
 ## Local development
 
@@ -33,14 +33,14 @@ deploys to Firebase Hosting. It also fires on `repository_dispatch` with
 
 ```sh
 # Create the GCP project
-gcloud projects create luke-personal --name="Personal"
+gcloud projects create luke-sarfas-personal --name="Personal"
 
 # Link a billing account (required for Firebase Hosting custom domain on Spark/Blaze)
-gcloud beta billing projects link luke-personal --billing-account=<BILLING_ID>
+gcloud billing projects link luke-sarfas-personal --billing-account=<BILLING_ID>
 
 # Wire Firebase
-firebase projects:addfirebase luke-personal
-firebase use luke-personal
+firebase projects:addfirebase luke-sarfas-personal
+firebase use luke-sarfas-personal
 
 # First manual deploy to confirm
 npm ci && npm run build
@@ -48,19 +48,19 @@ firebase deploy --only hosting
 
 # Create a deploy service account for CI
 gcloud iam service-accounts create gh-deploy \
-  --project=luke-personal --display-name="GitHub deploy"
+  --project=luke-sarfas-personal --display-name="GitHub deploy"
 
-gcloud projects add-iam-policy-binding luke-personal \
-  --member="serviceAccount:gh-deploy@luke-personal.iam.gserviceaccount.com" \
+gcloud projects add-iam-policy-binding luke-sarfas-personal \
+  --member="serviceAccount:gh-deploy@luke-sarfas-personal.iam.gserviceaccount.com" \
   --role="roles/firebasehosting.admin"
 
-gcloud projects add-iam-policy-binding luke-personal \
-  --member="serviceAccount:gh-deploy@luke-personal.iam.gserviceaccount.com" \
+gcloud projects add-iam-policy-binding luke-sarfas-personal \
+  --member="serviceAccount:gh-deploy@luke-sarfas-personal.iam.gserviceaccount.com" \
   --role="roles/serviceusage.serviceUsageConsumer"
 
 # Key + GitHub secret
 gcloud iam service-accounts keys create key.json \
-  --iam-account=gh-deploy@luke-personal.iam.gserviceaccount.com
+  --iam-account=gh-deploy@luke-sarfas-personal.iam.gserviceaccount.com
 gh secret set FIREBASE_SERVICE_ACCOUNT < key.json
 rm key.json
 
@@ -77,5 +77,5 @@ rm key.json
 └────────┬─────────┘                        └─────────────────────────┘
          │ firebase deploy
          ▼
-   Firebase Hosting (CDN, in `luke-personal` GCP project)
+   Firebase Hosting (CDN, in `luke-sarfas-personal` GCP project)
 ```
