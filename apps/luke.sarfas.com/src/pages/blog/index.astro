@@ -7,7 +7,7 @@ const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
 );
 
 const fmt = (d: Date) =>
-  d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+  d.toLocaleDateString("en-GB", { year: "numeric", month: "short", day: "numeric" });
 
 const SITE = "https://luke.sarfas.com";
 
@@ -42,36 +42,40 @@ const jsonLd = [
   description="Writing about what I'm building and thinking about. By Luke Sarfas, software engineer at Google."
   jsonLd={jsonLd}
 >
-  <section class="hero" style="padding-top:3rem;padding-bottom:0">
-    <span class="eyebrow">Writing</span>
-    <h1>Blog</h1>
-    <p class="lead">
-      Notes on what I'm building, ideas I'm working through, and the occasional
-      longer piece.
-    </p>
+  <section class="hero" style="grid-template-columns:1fr">
+    <div class="hero-main">
+      <span class="eyebrow">Writing</span>
+      <h1><em>Notes</em>, in the open</h1>
+      <p class="lead">
+        The part that wasn't in the README. Cooled thinking only, never drive-by
+        hot takes.
+      </p>
+    </div>
   </section>
 
-  <section class="section" style="margin-top:2.5rem">
+  <section class="section" style="margin-top:3rem">
     {posts.length === 0 ? (
-      <p class="muted">No posts yet. Drop a markdown file in <code>src/content/blog</code>.</p>
+      <p class="muted">No posts yet.</p>
     ) : (
-      <ul class="post-list">
-        {posts.map((p) => (
+      <ol class="post-list">
+        {posts.map((p, i) => (
           <li>
             <a href={`/blog/${p.slug}/`} class="post-link">
-              <div class="post-meta">
-                <time datetime={p.data.date.toISOString()}>{fmt(p.data.date)}</time>
-                {p.data.tags.length > 0 && (
-                  <span class="dot">·</span>
-                )}
-                {p.data.tags.map((t) => <span class="tag">{t}</span>)}
+              <span class="post-index">{String(i + 1).padStart(2, "0")}</span>
+              <div class="post-content">
+                <div class="post-meta">
+                  <time datetime={p.data.date.toISOString()}>{fmt(p.data.date)}</time>
+                  {p.data.tags.length > 0 && <span class="dot" aria-hidden="true">·</span>}
+                  {p.data.tags.slice(0, 3).map((t) => <span class="tag">{t}</span>)}
+                </div>
+                <h2 class="post-title">{p.data.title}</h2>
+                {p.data.description && <p class="muted">{p.data.description}</p>}
               </div>
-              <h2 class="post-title">{p.data.title}</h2>
-              {p.data.description && <p class="muted">{p.data.description}</p>}
+              <span class="post-arrow" aria-hidden="true">→</span>
             </a>
           </li>
         ))}
-      </ul>
+      </ol>
     )}
   </section>
 </Base>
@@ -81,39 +85,76 @@ const jsonLd = [
     list-style: none;
     padding: 0;
     margin: 0;
-    display: grid;
-    gap: 0.85rem;
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--border);
   }
+  .post-list li { border-bottom: 1px solid var(--border); }
   .post-link {
-    display: block;
-    padding: 1.1rem 1.25rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--card);
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1.5rem;
+    align-items: start;
+    padding: 1.6rem 1rem;
     color: var(--fg);
-    transition: border-color 200ms var(--ease), background 200ms var(--ease),
-      transform 200ms var(--ease);
+    transition: background 240ms var(--ease), padding 240ms var(--ease);
   }
   .post-link:hover {
-    border-color: var(--border-strong);
-    background: var(--card-hover);
+    background: var(--card);
     color: var(--fg);
-    transform: translateY(-1px);
+    padding-left: 1.5rem;
+  }
+  .post-index {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--muted);
+    padding-top: 0.35rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .post-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
   }
   .post-meta {
     display: flex;
     align-items: center;
     gap: 0.4rem;
     color: var(--muted);
-    font-size: 0.85rem;
-    margin-bottom: 0.35rem;
+    font-size: 0.82rem;
+    font-variant-numeric: tabular-nums;
   }
-  .post-meta .dot {
-    opacity: 0.6;
-  }
+  .post-meta .dot { opacity: 0.5; }
   .post-title {
-    font-size: 1.25rem;
-    margin: 0 0 0.35rem;
-    letter-spacing: -0.015em;
+    font-family: var(--font-serif);
+    font-size: clamp(1.4rem, 2.4vw, 1.8rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin: 0;
+  }
+  .post-link p {
+    max-width: 60ch;
+    margin: 0;
+    line-height: 1.5;
+  }
+  .post-arrow {
+    font-size: 1.2rem;
+    color: var(--muted);
+    transition: color 220ms var(--ease), transform 220ms var(--ease);
+    padding-top: 0.2rem;
+  }
+  .post-link:hover .post-arrow {
+    color: var(--signature);
+    transform: translateX(4px);
+  }
+  @media (max-width: 540px) {
+    .post-link {
+      grid-template-columns: auto 1fr;
+      gap: 0.9rem;
+      padding: 1.2rem 0.4rem;
+    }
+    .post-link:hover { padding-left: 0.7rem; }
+    .post-arrow { display: none; }
   }
 </style>

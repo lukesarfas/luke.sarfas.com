@@ -5,19 +5,33 @@ import { loadAll } from "~/lib/manifests";
 
 const projects = await loadAll();
 projects.sort((a, b) => (b.updated ?? "").localeCompare(a.updated ?? ""));
+
+const countByStatus = projects.reduce<Record<string, number>>((acc, p) => {
+  const k = p.status ?? "other";
+  acc[k] = (acc[k] ?? 0) + 1;
+  return acc;
+}, {});
 ---
 
 <Base title="Projects · Luke Sarfas" description="Personal projects and experiments by Luke Sarfas. Updated automatically as each one ships.">
-  <section class="hero" style="padding-top:3rem;padding-bottom:0">
-    <span class="eyebrow">Index</span>
-    <h1>Projects</h1>
-    <p class="lead">
-      Everything I'm building or have built. Each card pulls live data from the
-      project at build time, so what's here is what's true today.
-    </p>
+  <section class="hero" style="grid-template-columns:1fr">
+    <div class="hero-main">
+      <span class="eyebrow">Index</span>
+      <h1><em>Projects</em></h1>
+      <p class="lead">
+        Everything I'm building or have built. Each card pulls live data from the
+        project at build time, so what's here is what's true today.
+      </p>
+      <div class="meta-row">
+        <span><strong>{projects.length}</strong> total</span>
+        {countByStatus.active && <span><strong>{countByStatus.active}</strong> active</span>}
+        {countByStatus.wip && <span><strong>{countByStatus.wip}</strong> in progress</span>}
+        {countByStatus.archived && <span><strong>{countByStatus.archived}</strong> archived</span>}
+      </div>
+    </div>
   </section>
 
-  <section class="section" style="margin-top:2.5rem">
+  <section class="section" style="margin-top:3rem">
     {projects.length === 0 ? (
       <p class="muted">Nothing here yet.</p>
     ) : (
@@ -27,3 +41,19 @@ projects.sort((a, b) => (b.updated ?? "").localeCompare(a.updated ?? ""));
     )}
   </section>
 </Base>
+
+<style>
+  .meta-row {
+    display: flex;
+    gap: 1.25rem;
+    margin-top: 0.5rem;
+    color: var(--muted);
+    font-size: 0.88rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .meta-row strong {
+    color: var(--fg);
+    font-weight: 600;
+    margin-right: 0.25rem;
+  }
+</style>

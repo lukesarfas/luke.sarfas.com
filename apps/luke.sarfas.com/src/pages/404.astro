@@ -3,17 +3,43 @@ import Base from "~/layouts/Base.astro";
 ---
 
 <Base title="Not found · Luke Sarfas" description="That page doesn't exist.">
-  <section class="hero" style="padding-top:5rem;padding-bottom:1rem">
-    <span class="eyebrow">404</span>
-    <h1>Not <span class="gradient-text">found</span></h1>
-    <p class="lead">
-      Whatever you were looking for, it isn't here. It might have moved, or it
-      might never have existed. Either way, sorry about that.
-    </p>
-    <div class="actions">
-      <a class="btn btn-primary" href="/">Home</a>
-      <a class="btn" href="/projects/">Projects</a>
-      <a class="btn" href="/blog/">Blog</a>
+  <section class="hero hero-404">
+    <div class="hero-main">
+      <span class="eyebrow">Error 404</span>
+      <h1 class="big-404">
+        <span class="four">4</span>
+        <span class="oh">0</span>
+        <span class="four">4</span>
+      </h1>
+      <p class="lead">
+        Whatever you were looking for, it isn't here. It might have moved.
+        It might never have existed. Either way, sorry about that.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href="/">Home</a>
+        <a class="btn" href="/projects/">Projects</a>
+        <a class="btn" href="/blog/">Blog</a>
+      </div>
     </div>
   </section>
 </Base>
+
+<style>
+  .hero-404 {
+    grid-template-columns: 1fr;
+    padding-top: 4rem;
+  }
+  .big-404 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: clamp(7rem, 22vw, 16rem);
+    line-height: 0.85;
+    letter-spacing: -0.06em;
+    color: var(--fg);
+    margin: 0;
+  }
+  .big-404 .oh {
+    color: var(--signature);
+    font-style: italic;
+  }
+</style>

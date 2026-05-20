@@ -8,6 +8,18 @@ interface Props {
 
 const { project } = Astro.props;
 const statusClass = project.status ? `status-${project.status}` : "";
+
+const updatedLabel = (() => {
+  if (!project.updated) return null;
+  try {
+    return new Date(project.updated).toLocaleDateString("en-GB", {
+      year: "numeric",
+      month: "short",
+    });
+  } catch {
+    return project.updated;
+  }
+})();
 ---
 
 <a class="pcard" href={`/projects/${project.slug}/`}>
@@ -25,5 +37,9 @@ const statusClass = project.status ? `status-${project.status}` : "";
         {project.tags.slice(0, 4).map((t) => <span class="tag">{t}</span>)}
       </div>
     )}
+    <div class="footer">
+      <span>{updatedLabel ? `Updated ${updatedLabel}` : "Project"}</span>
+      <span class="open">Open <span aria-hidden="true">→</span></span>
+    </div>
   </div>
 </a>

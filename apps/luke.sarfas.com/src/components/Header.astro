@@ -9,19 +9,53 @@ const links = [
   { href: "/projects", label: "Projects" },
   { href: "/now", label: "Now" },
   { href: "/career", label: "Career" },
-  { href: "/personal", label: "Personal" },
   { href: "/blog", label: "Blog" },
   { href: "/contact", label: "Contact" },
 ];
 ---
 
-<nav class="top">
+<a href="#main" class="skip-link">Skip to content</a>
+
+<nav class="top" aria-label="Primary">
   <div class="nav-inner">
-    <a href="/" class="brand">luke<span style="color:var(--accent)">.</span>sarfas<span style="color:var(--accent)">.</span>com</a>
-    <div class="links">
+    <a href="/" class="brand" aria-label="Luke Sarfas, home">
+      <span class="brand-mark" aria-hidden="true">L</span>
+      <span>Luke Sarfas</span>
+    </a>
+    <button
+      type="button"
+      class="mobile-toggle"
+      aria-label="Toggle menu"
+      aria-controls="primary-links"
+      aria-expanded="false"
+      id="nav-toggle"
+    >
+      <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+        <path d="M1 4h12M1 10h12" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </button>
+    <div class="links" id="primary-links">
       {links.map((l) => (
         <a href={l.href} class={active(l.href) ? "active" : ""}>{l.label}</a>
       ))}
     </div>
   </div>
 </nav>
+
+<script is:inline>
+  (() => {
+    const t = document.getElementById("nav-toggle");
+    const l = document.getElementById("primary-links");
+    if (!t || !l) return;
+    t.addEventListener("click", () => {
+      const open = l.classList.toggle("open");
+      t.setAttribute("aria-expanded", String(open));
+    });
+    l.addEventListener("click", (e) => {
+      if (e.target instanceof HTMLAnchorElement) {
+        l.classList.remove("open");
+        t.setAttribute("aria-expanded", "false");
+      }
+    });
+  })();
+</script>

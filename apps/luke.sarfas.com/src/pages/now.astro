@@ -1,43 +1,77 @@
 ---
 import Base from "~/layouts/Base.astro";
+
+const fmtMonth = new Date().toLocaleDateString("en-GB", { month: "long", year: "numeric" });
 ---
 
 <Base title="Now · Luke Sarfas" description="What I'm focused on right now.">
-  <section class="hero" style="padding-top:3rem;padding-bottom:0">
-    <span class="eyebrow">Now</span>
-    <h1>What I'm doing <span class="gradient-text">right now</span></h1>
-    <p class="lead">
-      A snapshot of what has my attention this season. Inspired by
-      <a href="https://nownownow.com/about" rel="noreferrer">nownownow</a>.
-    </p>
+  <section class="hero" style="grid-template-columns:1fr">
+    <div class="hero-main">
+      <span class="eyebrow">Now, {fmtMonth}</span>
+      <h1>What I'm doing<br /><em>right now</em></h1>
+      <p class="lead">
+        A snapshot of what has my attention this season. Inspired by
+        <a href="https://nownownow.com/about" rel="noreferrer">nownownow</a>.
+      </p>
+    </div>
   </section>
 
-  <section class="section" style="margin-top:2.5rem">
-    <div class="prose">
-      <p>
-        Currently a software engineer at Google in London, working on the things
-        software engineers work on. Outside of that, building a couple of side
-        projects in this monorepo, the most recent of which is
-        <a href="/projects/">listed here</a>.
-      </p>
-      <p>
-        This page exists so I have somewhere to keep the answer to "what are you
-        up to?" without having to repeat myself. If it's been more than a couple
-        of months since the date below and it still looks like this, the page is
-        stale. Email me and call me out.
-      </p>
-      <p class="updated muted">More to come.</p>
+  <section class="section" style="margin-top:3rem">
+    <div class="now-grid">
+      <article class="now-card">
+        <span class="eyebrow">Working</span>
+        <h2>Software engineer at Google, London</h2>
+        <p>The day job. I work on the things software engineers work on.</p>
+      </article>
+
+      <article class="now-card">
+        <span class="eyebrow">Building</span>
+        <h2><a href="/projects/thinkwell/">ThinkWell</a></h2>
+        <p>A journal designed to feel like building something, not keeping a streak. Olivia named it. Olivia helped me build it.</p>
+      </article>
+
+      <article class="now-card">
+        <span class="eyebrow">Writing</span>
+        <h2>The <a href="/blog/">blog</a></h2>
+        <p>Notes on the part that wasn't in the README. Cooled thinking only.</p>
+      </article>
+
+      <article class="now-card">
+        <span class="eyebrow">Reading</span>
+        <h2 class="muted serif italic">More to come.</h2>
+        <p>Refreshed when I get round to it. If this looks stale, email me and call me out.</p>
+      </article>
     </div>
   </section>
 </Base>
 
 <style>
-  .prose p {
-    margin-bottom: 1rem;
-    max-width: 70ch;
+  .now-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
   }
-  .updated {
-    margin-top: 2.5rem;
-    font-size: 0.85rem;
+  .now-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 1.4rem 1.5rem 1.6rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--card);
+    transition: border-color 240ms var(--ease), background 240ms var(--ease);
+  }
+  .now-card:hover {
+    border-color: color-mix(in oklab, var(--signature) 30%, var(--border-strong));
+    background: var(--card-hover);
+  }
+  .now-card h2 {
+    font-size: 1.35rem;
+    line-height: 1.15;
+  }
+  .now-card p {
+    color: var(--muted);
+    font-size: 0.98rem;
+    line-height: 1.5;
   }
 </style>

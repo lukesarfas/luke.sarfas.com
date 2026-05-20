@@ -12,18 +12,28 @@ const { project } = Astro.props;
 const statusClass = project.status ? `status-${project.status}` : "";
 const appletUrl = typeof project.applet === "string" ? project.applet : project.applet ? `/sites/${project.slug}/` : null;
 const heroImg = project.preview ? new URL(project.preview, "https://luke.sarfas.com").toString() : undefined;
+
+const fmt = (s?: string) => {
+  if (!s) return null;
+  try {
+    return new Date(s).toLocaleDateString("en-GB", { year: "numeric", month: "long", day: "numeric" });
+  } catch {
+    return s;
+  }
+};
 ---
 
 <Base title={`${project.name} · Luke Sarfas`} description={project.tagline} image={heroImg} imageAlt={`${project.name} preview`}>
-  <a href="/projects" class="backlink" style="margin-top:1.5rem;display:inline-flex">← All projects</a>
+  <a href="/projects/" class="backlink" style="margin-top:0.5rem;display:inline-flex">← All projects</a>
 
-  <header class="detail-head" style="margin-top:1.5rem">
+  <header class="detail-head" style="margin-top:1.25rem">
+    <span class="eyebrow">Project</span>
     <h1>{project.name}</h1>
-    {project.tagline && <p class="lead muted" style="max-width:60ch">{project.tagline}</p>}
+    {project.tagline && <p class="post-deck">{project.tagline}</p>}
     <div class="detail-meta">
       {project.status && <span class={`status ${statusClass}`}>{project.status}</span>}
       {project.version && <span>v{project.version}</span>}
-      {project.updated && <span>updated {project.updated}</span>}
+      {project.updated && <span>· updated {fmt(project.updated)}</span>}
     </div>
   </header>
 
@@ -39,34 +49,79 @@ const heroImg = project.preview ? new URL(project.preview, "https://luke.sarfas.
 
   {project.links && (
     <div class="detail-actions">
-      {project.links.site && <a class="btn btn-primary" href={project.links.site}>Visit site ↗</a>}
-      {project.links.demo && <a class="btn" href={project.links.demo}>Live demo ↗</a>}
-      {project.links.repo && <a class="btn" href={project.links.repo}>Source ↗</a>}
-      {project.links.docs && <a class="btn" href={project.links.docs}>Docs ↗</a>}
+      {project.links.site && <a class="btn btn-primary" href={project.links.site}>Visit site <span class="arrow" aria-hidden="true">↗</span></a>}
+      {project.links.demo && <a class="btn" href={project.links.demo}>Live demo <span class="arrow" aria-hidden="true">↗</span></a>}
+      {project.links.repo && <a class="btn" href={project.links.repo}>Source <span class="arrow" aria-hidden="true">↗</span></a>}
+      {project.links.docs && <a class="btn" href={project.links.docs}>Docs <span class="arrow" aria-hidden="true">↗</span></a>}
     </div>
   )}
 
   {appletUrl && (
-    <section style="margin-top:3rem">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.75rem">
-        <h2 style="font-size:1.4rem;font-weight:600;letter-spacing:-0.02em">Live applet</h2>
-        <a href={appletUrl} class="muted" style="font-size:0.9rem">Open in new tab ↗</a>
+    <section class="applet-section">
+      <div class="applet-head">
+        <h2>Live applet</h2>
+        <a href={appletUrl} class="muted applet-open">Open full screen ↗</a>
       </div>
-      <div style="border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--bg-2);box-shadow:var(--shadow);aspect-ratio:16/10">
+      <div class="applet-frame">
         <iframe
           src={appletUrl}
           title={`${project.name} applet`}
           loading="lazy"
           referrerpolicy="no-referrer"
-          style="width:100%;height:100%;border:0;display:block;background:transparent"
         ></iframe>
       </div>
     </section>
   )}
 
   {project.tags && project.tags.length > 0 && (
-    <div style="margin-top:1.75rem">
+    <div class="tag-row">
       {project.tags.map((t) => <span class="tag">{t}</span>)}
     </div>
   )}
 </Base>
+
+<style>
+  .post-deck {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(1.15rem, 1.8vw, 1.35rem);
+    color: var(--muted);
+    max-width: 56ch;
+    line-height: 1.4;
+    margin: 0;
+  }
+  .applet-section { margin-top: 3.5rem; }
+  .applet-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    padding-bottom: 0.8rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .applet-head h2 {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    font-size: 1.65rem;
+    letter-spacing: -0.02em;
+  }
+  .applet-open { font-size: 0.88rem; }
+  .applet-frame {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--bg-2);
+    box-shadow: var(--shadow-strong);
+    aspect-ratio: 16/10;
+  }
+  .applet-frame iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    background: transparent;
+  }
+  .tag-row { margin-top: 2rem; }
+</style>

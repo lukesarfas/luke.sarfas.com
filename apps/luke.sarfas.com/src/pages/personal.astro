@@ -3,16 +3,18 @@ import Base from "~/layouts/Base.astro";
 ---
 
 <Base title="Personal · Luke Sarfas" description="The non-work me.">
-  <section class="hero" style="padding-top:3rem;padding-bottom:0">
-    <span class="eyebrow">Personal</span>
-    <h1>Personal</h1>
-    <p class="lead">
-      The non-work me. Still figuring out what belongs on this page.
-    </p>
+  <section class="hero" style="grid-template-columns:1fr">
+    <div class="hero-main">
+      <span class="eyebrow">Personal</span>
+      <h1>The <em>non-work</em> me</h1>
+      <p class="lead">
+        Still figuring out what belongs on this page. For now, a few honest sentences.
+      </p>
+    </div>
   </section>
 
-  <section class="section" style="margin-top:2.5rem">
-    <div class="prose">
+  <section class="section" style="margin-top:3rem">
+    <div class="detail-body" style="font-size:1.1rem">
       <p>
         I'm Luke. I live in London. I like riddles. Ask me one.
       </p>
@@ -25,10 +27,3 @@ import Base from "~/layouts/Base.astro";
     </div>
   </section>
 </Base>
-
-<style>
-  .prose p {
-    margin-bottom: 1rem;
-    max-width: 70ch;
-  }
-</style>
