@@ -6,14 +6,9 @@ import Base from "~/layouts/Base.astro";
   <section class="hero hero-404">
     <div class="hero-main">
       <span class="eyebrow">Error 404</span>
-      <h1 class="big-404">
-        <span class="four">4</span>
-        <span class="oh">0</span>
-        <span class="four">4</span>
-      </h1>
+      <h1 class="big-404">404</h1>
       <p class="lead">
-        Whatever you were looking for, it isn't here. It might have moved.
-        It might never have existed. Either way, sorry about that.
+        That page doesn't exist.
       </p>
       <div class="actions">
         <a class="btn btn-primary" href="/">Home</a>
@@ -32,14 +27,10 @@ import Base from "~/layouts/Base.astro";
   .big-404 {
     font-family: var(--font-serif);
     font-weight: 400;
-    font-size: clamp(7rem, 22vw, 16rem);
-    line-height: 0.85;
-    letter-spacing: -0.06em;
+    font-size: clamp(6rem, 18vw, 12rem);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
     color: var(--fg);
     margin: 0;
-  }
-  .big-404 .oh {
-    color: var(--signature);
-    font-style: italic;
   }
 </style>

@@ -7,11 +7,10 @@ const fmtMonth = new Date().toLocaleDateString("en-GB", { month: "long", year: "
 <Base title="Now · Luke Sarfas" description="What I'm focused on right now.">
   <section class="hero" style="grid-template-columns:1fr">
     <div class="hero-main">
-      <span class="eyebrow">Now, {fmtMonth}</span>
-      <h1>What I'm doing<br /><em>right now</em></h1>
+      <span class="eyebrow">{fmtMonth}</span>
+      <h1>Now</h1>
       <p class="lead">
-        A snapshot of what has my attention this season. Inspired by
-        <a href="https://nownownow.com/about" rel="noreferrer">nownownow</a>.
+        What I'm focused on right now.
       </p>
     </div>
   </section>
@@ -19,28 +18,21 @@ const fmtMonth = new Date().toLocaleDateString("en-GB", { month: "long", year: "
   <section class="section" style="margin-top:3rem">
     <div class="now-grid">
       <article class="now-card">
-        <span class="eyebrow">Working</span>
-        <h2>Software engineer at Google, London</h2>
-        <p>The day job. I work on the things software engineers work on.</p>
+        <span class="eyebrow">Work</span>
+        <h2>Software engineer at Google, London.</h2>
       </article>
 
       <article class="now-card">
         <span class="eyebrow">Building</span>
         <h2><a href="/projects/thinkwell/">ThinkWell</a></h2>
-        <p>A journal designed to feel like building something, not keeping a streak. Olivia named it. Olivia helped me build it.</p>
+        <p>AI-assisted personal journaling.</p>
       </article>
 
       <article class="now-card">
         <span class="eyebrow">Writing</span>
-        <h2>The <a href="/blog/">blog</a></h2>
-        <p>Notes on the part that wasn't in the README. Cooled thinking only.</p>
+        <h2><a href="/blog/">Blog</a></h2>
       </article>
 
-      <article class="now-card">
-        <span class="eyebrow">Reading</span>
-        <h2 class="muted serif italic">More to come.</h2>
-        <p>Refreshed when I get round to it. If this looks stale, email me and call me out.</p>
-      </article>
     </div>
   </section>
 </Base>

@@ -144,26 +144,15 @@ const jsonLd = [
 
 <style>
   .post-deck {
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-size: clamp(1.15rem, 1.8vw, 1.4rem);
+    font-size: clamp(1.05rem, 1.4vw, 1.2rem);
     color: var(--muted);
-    max-width: 56ch;
-    line-height: 1.4;
+    max-width: 60ch;
+    line-height: 1.5;
     margin: 0;
   }
   .post-body {
     font-size: 1.08rem;
     line-height: 1.78;
-  }
-  .post-body :global(p:first-of-type::first-letter) {
-    font-family: var(--font-serif);
-    font-weight: 400;
-    font-size: 3.4em;
-    line-height: 0.9;
-    float: left;
-    padding: 0.1em 0.12em 0 0;
-    color: var(--signature);
   }
   .post-body :global(h2) {
     font-family: var(--font-serif);
@@ -196,13 +185,10 @@ const jsonLd = [
     font-size: 0.92em;
   }
   .post-body :global(blockquote) {
-    border-left: 2px solid var(--signature);
+    border-left: 2px solid var(--border-strong);
     padding-left: 1.1rem;
-    color: var(--fg-soft);
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-size: 1.15em;
-    line-height: 1.45;
+    color: var(--muted);
+    line-height: 1.55;
   }
   .post-body :global(a) {
     color: var(--signature);
