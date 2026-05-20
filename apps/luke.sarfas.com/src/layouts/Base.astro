@@ -8,17 +8,35 @@ interface Props {
   title: string;
   description?: string;
   image?: string;
+  imageAlt?: string;
   type?: "website" | "article";
+  publishedTime?: string;
+  modifiedTime?: string;
+  tags?: string[];
+  jsonLd?: object | object[];
 }
 
 const SITE_URL = "https://luke.sarfas.com";
 const {
   title,
-  description = "Luke Sarfas. Projects, writing, and what I'm building.",
+  description = "Luke Sarfas. Software engineer and machine-learning practitioner. Projects, writing, and what I'm building.",
   image,
+  imageAlt,
   type = "website",
+  publishedTime,
+  modifiedTime,
+  tags,
+  jsonLd,
 } = Astro.props;
+
 const url = new URL(Astro.url.pathname, SITE_URL).toString();
+const absImage = image
+  ? (image.startsWith("http") ? image : new URL(image, SITE_URL).toString())
+  : undefined;
+
+const ldEntries = jsonLd
+  ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd])
+  : [];
 ---
 
 <!doctype html>
@@ -27,7 +45,10 @@ const url = new URL(Astro.url.pathname, SITE_URL).toString();
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#08090c" />
+    <meta name="color-scheme" content="dark" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/favicon.svg" />
+    <link rel="manifest" href="/site.webmanifest" />
     <link
       rel="alternate"
       type="application/rss+xml"
@@ -38,9 +59,17 @@ const url = new URL(Astro.url.pathname, SITE_URL).toString();
       title={title}
       description={description}
       url={url}
-      image={image}
+      image={absImage}
+      imageAlt={imageAlt}
       type={type}
+      author="Luke Sarfas"
+      publishedTime={publishedTime}
+      modifiedTime={modifiedTime}
+      tags={tags}
     />
+    {ldEntries.map((entry) => (
+      <script type="application/ld+json" set:html={JSON.stringify(entry)} />
+    ))}
   </head>
   <body>
     <Header />

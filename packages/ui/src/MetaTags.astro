@@ -4,30 +4,68 @@ interface Props {
   description: string;
   url: string;
   image?: string;
+  imageAlt?: string;
   type?: "website" | "article";
+  siteName?: string;
+  locale?: string;
+  publishedTime?: string;
+  modifiedTime?: string;
+  author?: string;
+  tags?: string[];
+  twitterSite?: string;
+  twitterCreator?: string;
 }
 const {
   title,
   description,
   url,
   image,
+  imageAlt,
   type = "website",
+  siteName = "Luke Sarfas",
+  locale = "en_GB",
+  publishedTime,
+  modifiedTime,
+  author,
+  tags,
+  twitterSite,
+  twitterCreator,
 } = Astro.props;
 ---
 
 <title>{title}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={url} />
+{author && <meta name="author" content={author} />}
 
 <meta property="og:type" content={type} />
+<meta property="og:site_name" content={siteName} />
+<meta property="og:locale" content={locale} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={url} />
 {image && <meta property="og:image" content={image} />}
 {image && <meta property="og:image:width" content="1200" />}
 {image && <meta property="og:image:height" content="630" />}
+{image && imageAlt && <meta property="og:image:alt" content={imageAlt} />}
+
+{type === "article" && publishedTime && (
+  <meta property="article:published_time" content={publishedTime} />
+)}
+{type === "article" && modifiedTime && (
+  <meta property="article:modified_time" content={modifiedTime} />
+)}
+{type === "article" && author && (
+  <meta property="article:author" content={author} />
+)}
+{type === "article" && tags && tags.map((t) => (
+  <meta property="article:tag" content={t} />
+))}
 
 <meta name="twitter:card" content={image ? "summary_large_image" : "summary"} />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 {image && <meta name="twitter:image" content={image} />}
+{image && imageAlt && <meta name="twitter:image:alt" content={imageAlt} />}
+{twitterSite && <meta name="twitter:site" content={twitterSite} />}
+{twitterCreator && <meta name="twitter:creator" content={twitterCreator} />}

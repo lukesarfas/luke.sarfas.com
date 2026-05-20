@@ -8,9 +8,40 @@ const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
 
 const fmt = (d: Date) =>
   d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+
+const SITE = "https://luke.sarfas.com";
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    name: "Luke Sarfas",
+    url: `${SITE}/blog/`,
+    description: "Writing about what I'm building and thinking about.",
+    author: { "@type": "Person", name: "Luke Sarfas", url: SITE },
+    blogPost: posts.map((p) => ({
+      "@type": "BlogPosting",
+      headline: p.data.title,
+      url: `${SITE}/blog/${p.slug}/`,
+      datePublished: p.data.date.toISOString(),
+    })),
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: `${SITE}/` },
+      { "@type": "ListItem", position: 2, name: "Blog", item: `${SITE}/blog/` },
+    ],
+  },
+];
 ---
 
-<Base title="Blog · Luke Sarfas" description="Writing about what I'm building and thinking about.">
+<Base
+  title="Blog · Luke Sarfas"
+  description="Writing about what I'm building and thinking about. By Luke Sarfas, software engineer at Google."
+  jsonLd={jsonLd}
+>
   <section class="hero" style="padding-top:3rem;padding-bottom:0">
     <span class="eyebrow">Writing</span>
     <h1>Blog</h1>

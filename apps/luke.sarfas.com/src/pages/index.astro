@@ -6,9 +6,45 @@ import { loadAll } from "~/lib/manifests";
 const projects = await loadAll();
 projects.sort((a, b) => (b.updated ?? "").localeCompare(a.updated ?? ""));
 const featured = projects.slice(0, 6);
+
+const SITE = "https://luke.sarfas.com";
+
+const jsonLd = [
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "Luke Sarfas",
+    url: SITE,
+    jobTitle: "Software Engineer",
+    description:
+      "Software engineer and machine-learning practitioner. Currently at Google, previously Amazon.",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "London",
+      addressCountry: "GB",
+    },
+    alumniOf: {
+      "@type": "CollegeOrUniversity",
+      name: "University of Warwick",
+    },
+    sameAs: ["https://www.linkedin.com/in/lukesarfas/"],
+    email: "mailto:luke@sarfas.com",
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "Luke Sarfas",
+    url: SITE,
+    author: { "@type": "Person", name: "Luke Sarfas" },
+  },
+];
 ---
 
-<Base title="Luke Sarfas">
+<Base
+  title="Luke Sarfas · Software engineer, builder, writer"
+  description="Personal site of Luke Sarfas. Software engineer at Google, previously Amazon. Side projects, writing, and what I'm building."
+  jsonLd={jsonLd}
+>
   <section class="hero">
     <span class="eyebrow fade-in">Independent builder</span>
     <h1 class="fade-in fade-in-1">

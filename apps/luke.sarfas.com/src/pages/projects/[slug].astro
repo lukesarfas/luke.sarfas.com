@@ -14,7 +14,7 @@ const appletUrl = typeof project.applet === "string" ? project.applet : project.
 const heroImg = project.preview ? new URL(project.preview, "https://luke.sarfas.com").toString() : undefined;
 ---
 
-<Base title={`${project.name} — Luke Sarfas`} description={project.tagline} image={heroImg}>
+<Base title={`${project.name} · Luke Sarfas`} description={project.tagline} image={heroImg} imageAlt={`${project.name} preview`}>
   <a href="/projects" class="backlink" style="margin-top:1.5rem;display:inline-flex">← All projects</a>
 
   <header class="detail-head" style="margin-top:1.5rem">
