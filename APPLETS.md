@@ -117,7 +117,10 @@ marketing site — just the raw applet bundle).
 
 A reusable GitHub Actions workflow that uploads from a `site/` directory in
 any source repo lives at
-[`.github/workflows/publish-applet.example.yml`](.github/workflows/publish-applet.example.yml).
+[`examples/publish-applet.template.yml`](examples/publish-applet.template.yml).
+Copy it into the source repo at `.github/workflows/publish-applet.yml` (do not
+keep it under `.github/workflows/` here — GitHub picks up every yaml file in
+that directory and tries to execute it).
 
 ## Iframe-embedded applets: contract
 
