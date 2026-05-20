@@ -1,7 +1,9 @@
 ---
-title: Why I started ThinkWell
+title: "Why I started ThinkWell"
+description: "I always wanted to be the kind of person who journals. I never was. ThinkWell is the version of journaling I actually wanted to use."
 date: 2026-04-07
-excerpt: I always wanted to be the kind of person who journals. I never was. ThinkWell is the version of journaling I actually wanted to use.
+tags: ["thinkwell", "building"]
+draft: false
 ---
 
 I have wanted to journal for years. I just never did it.
