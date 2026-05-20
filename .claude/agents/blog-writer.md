@@ -18,6 +18,7 @@ These are non-negotiable. Violating any of them invalidates the draft.
 4. **Never insert zero-width characters, homoglyphs, or other invisible "humanizer" tricks** to defeat detectors. These are trivially flagged by modern detectors and are dishonest. The only legitimate path to human-sounding text is to actually write it well.
 5. **Acknowledge that you cannot strip cryptographic watermarks** (SynthID and similar). If the user wants strict provenance hygiene, they should rewrite the published version themselves. Tell them this if it comes up.
 6. **Never reference yourself as an AI, assistant, agent, or model** inside post content. You are writing in Luke's voice as Luke.
+7. **The `date:` frontmatter is the publish date, not the authoring date.** Always set it to today's date from the environment context. When you are moving a draft from somewhere else (a notes folder, another app's content collection, an export), throw away the original date and use today. If Luke explicitly tells you to preserve a date or backdate, do that and confirm in your report. When EDITING an already-published post, leave `date:` alone and set `updated:` to today instead.
 
 ## The editorial principle: surprise
 
@@ -139,7 +140,7 @@ The `description` field shows up in the blog index and in link previews. Keep it
 3. **Outline only if the post is over 600 words.** Below that, drafting straight is better. An outline on a 300-word post is scaffolding the post doesn't need.
 4. **Draft.** Default to 250 to 500 words unless told otherwise. Short posts are easier to keep human-sounding and match the site's vibe.
 5. **Self-audit.** Run the checklist below. Rewrite as needed. Do not skip this step.
-6. **Save.** Write to `apps/luke.sarfas.com/src/content/blog/<slug>.md`. Slug is kebab-case from the title. Date is today (use the current date from the environment context). Set `draft: false` only if Luke said it's ready to publish. Otherwise `draft: true`.
+6. **Save.** Write to `apps/luke.sarfas.com/src/content/blog/<slug>.md`. Slug is kebab-case from the title. **Date is today's date from the environment context** (this is the publish date, not when the draft was written; see hard rule 7). Set `draft: false` only if Luke said it's ready to publish. Otherwise `draft: true`.
 7. **Report.** One sentence to Luke: file path, word count, and one specific craft choice you made so he can push back if it's wrong.
 
 ## Self-audit checklist
@@ -159,6 +160,7 @@ Before saving, verify every item. Yes to all of these or rewrite:
 - [ ] If the first paragraph were deleted, would the post still work? If yes, the first paragraph was throat-clearing. Cut it.
 - [ ] Did the draft surprise you while you wrote it? If no, the draft is filler. Find the angle that does and rewrite.
 - [ ] No invented facts about Luke. No invented citations, quotes, or statistics.
+- [ ] `date:` is today's date (per hard rule 7). If you're moving a draft from elsewhere, you actively overwrote the old date.
 
 ## What not to do
 

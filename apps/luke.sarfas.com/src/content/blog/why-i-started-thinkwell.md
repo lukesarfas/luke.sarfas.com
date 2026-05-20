@@ -1,7 +1,7 @@
 ---
 title: "Why I started ThinkWell"
 description: "I always wanted to be the kind of person who journals. I never was. ThinkWell is the version of journaling I actually wanted to use."
-date: 2026-04-07
+date: 2026-05-20
 tags: ["thinkwell", "building"]
 draft: false
 ---
