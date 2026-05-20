@@ -1,0 +1,88 @@
+---
+import Base from "~/layouts/Base.astro";
+import { getCollection } from "astro:content";
+
+const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+);
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
+---
+
+<Base title="Blog — Luke Sarfas" description="Writing about what I'm building and thinking about.">
+  <section class="hero" style="padding-top:3rem;padding-bottom:0">
+    <span class="eyebrow">Writing</span>
+    <h1>Blog</h1>
+    <p class="lead">
+      Notes on what I'm building, ideas I'm working through, and the occasional
+      longer piece.
+    </p>
+  </section>
+
+  <section class="section" style="margin-top:2.5rem">
+    {posts.length === 0 ? (
+      <p class="muted">No posts yet. Drop a markdown file in <code>src/content/blog</code>.</p>
+    ) : (
+      <ul class="post-list">
+        {posts.map((p) => (
+          <li>
+            <a href={`/blog/${p.slug}/`} class="post-link">
+              <div class="post-meta">
+                <time datetime={p.data.date.toISOString()}>{fmt(p.data.date)}</time>
+                {p.data.tags.length > 0 && (
+                  <span class="dot">·</span>
+                )}
+                {p.data.tags.map((t) => <span class="tag">{t}</span>)}
+              </div>
+              <h2 class="post-title">{p.data.title}</h2>
+              {p.data.description && <p class="muted">{p.data.description}</p>}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
+  </section>
+</Base>
+
+<style>
+  .post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.85rem;
+  }
+  .post-link {
+    display: block;
+    padding: 1.1rem 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--fg);
+    transition: border-color 200ms var(--ease), background 200ms var(--ease),
+      transform 200ms var(--ease);
+  }
+  .post-link:hover {
+    border-color: var(--border-strong);
+    background: var(--card-hover);
+    color: var(--fg);
+    transform: translateY(-1px);
+  }
+  .post-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-bottom: 0.35rem;
+  }
+  .post-meta .dot {
+    opacity: 0.6;
+  }
+  .post-title {
+    font-size: 1.25rem;
+    margin: 0 0 0.35rem;
+    letter-spacing: -0.015em;
+  }
+</style>

@@ -1,0 +1,82 @@
+---
+import "@sarfas/ui/fonts.css";
+import "@sarfas/ui/tokens.css";
+import MetaTags from "@sarfas/ui/MetaTags.astro";
+import Container from "@sarfas/ui/Container.astro";
+import Button from "@sarfas/ui/Button.astro";
+
+const SITE_URL = "https://thinkwell.app";
+const title = "ThinkWell — your private thinking partner.";
+const description =
+  "AI-powered personal journaling for iOS and web. Voice or text in, themes and through-lines out. Private by default.";
+const url = new URL(Astro.url.pathname, SITE_URL).toString();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#08090c" />
+    <MetaTags title={title} description={description} url={url} image="/preview.png" />
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+        background:
+          radial-gradient(1200px 600px at 50% -200px, rgba(139, 157, 255, 0.18), transparent 60%),
+          radial-gradient(900px 500px at 90% 10%, rgba(196, 166, 255, 0.12), transparent 60%),
+          var(--bg);
+        color: var(--fg);
+        font-family: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
+        min-height: 100vh;
+      }
+      .hero { padding: 6rem 0 4rem; }
+      h1 {
+        font-size: clamp(2.4rem, 7vw, 4rem);
+        font-weight: 700;
+        letter-spacing: -0.035em;
+        line-height: 1.05;
+        margin: 0 0 1rem;
+      }
+      .accent {
+        background: linear-gradient(135deg, #8b9dff 0%, #c4a6ff 60%, #6dd5d3 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      p.lead {
+        font-size: 1.2rem;
+        line-height: 1.55;
+        color: var(--muted);
+        max-width: 56ch;
+        margin: 0 0 1.75rem;
+      }
+      .actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
+      .muted-row {
+        margin-top: 4rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border);
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <Container as="section" class="hero">
+      <h1>Journal a little.<br /><span class="accent">Understand a lot.</span></h1>
+      <p class="lead">
+        ThinkWell turns scattered thoughts into a private, searchable thinking
+        partner. Voice or text in, themes and through-lines out. Private by
+        default; you own the data.
+      </p>
+      <div class="actions">
+        <Button variant="primary" href="mailto:lukesarfas@icloud.com?subject=ThinkWell%20beta">Get on the beta list</Button>
+        <Button href="https://luke.sarfas.com/projects/thinkwell/" external>About the project</Button>
+      </div>
+      <div class="muted-row">
+        Built by <a href="https://luke.sarfas.com" style="color:var(--muted)">Luke Sarfas</a> · Status: active development
+      </div>
+    </Container>
+  </body>
+</html>

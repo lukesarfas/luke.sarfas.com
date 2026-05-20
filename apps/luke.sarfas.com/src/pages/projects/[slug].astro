@@ -10,9 +10,11 @@ export async function getStaticPaths() {
 
 const { project } = Astro.props;
 const statusClass = project.status ? `status-${project.status}` : "";
+const appletUrl = typeof project.applet === "string" ? project.applet : project.applet ? `/sites/${project.slug}/` : null;
+const heroImg = project.preview ? new URL(project.preview, "https://luke.sarfas.com").toString() : undefined;
 ---
 
-<Base title={`${project.name} — Luke Sarfas`} description={project.tagline}>
+<Base title={`${project.name} — Luke Sarfas`} description={project.tagline} image={heroImg}>
   <a href="/projects" class="backlink" style="margin-top:1.5rem;display:inline-flex">← All projects</a>
 
   <header class="detail-head" style="margin-top:1.5rem">
@@ -42,6 +44,24 @@ const statusClass = project.status ? `status-${project.status}` : "";
       {project.links.repo && <a class="btn" href={project.links.repo}>Source ↗</a>}
       {project.links.docs && <a class="btn" href={project.links.docs}>Docs ↗</a>}
     </div>
+  )}
+
+  {appletUrl && (
+    <section style="margin-top:3rem">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:0.75rem;flex-wrap:wrap;margin-bottom:0.75rem">
+        <h2 style="font-size:1.4rem;font-weight:600;letter-spacing:-0.02em">Live applet</h2>
+        <a href={appletUrl} class="muted" style="font-size:0.9rem">Open in new tab ↗</a>
+      </div>
+      <div style="border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;background:var(--bg-2);box-shadow:var(--shadow);aspect-ratio:16/10">
+        <iframe
+          src={appletUrl}
+          title={`${project.name} applet`}
+          loading="lazy"
+          referrerpolicy="no-referrer"
+          style="width:100%;height:100%;border:0;display:block;background:transparent"
+        ></iframe>
+      </div>
+    </section>
   )}
 
   {project.tags && project.tags.length > 0 && (

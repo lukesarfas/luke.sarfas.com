@@ -1,0 +1,59 @@
+# Drop-in workflow for a remote applet — copy into the SOURCE PROJECT'S repo at
+# .github/workflows/publish-applet.yml. Maintain manifest.json + preview.png
+# under site/ in that repo; this workflow uploads them to GCS on every push.
+#
+# Required GitHub secrets in the source repo:
+#   APPLETS_PUBLISHER_KEY   — full JSON key of applets-publisher SA
+#                             (Workload Identity Federation is preferred long-term;
+#                              see https://github.com/google-github-actions/auth)
+#
+# Edit APPLET_SLUG below.
+
+name: Publish applet
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "site/**"
+  workflow_dispatch: {}
+
+env:
+  APPLET_SLUG: "your-slug-here"
+  BUCKET: "luke-sarfas-applets"
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.APPLETS_PUBLISHER_KEY }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Validate manifest
+        run: |
+          test -f site/manifest.json || { echo "site/manifest.json missing"; exit 1; }
+          test -f site/preview.png  || { echo "site/preview.png missing";  exit 1; }
+          jq -e '.name and .slug' site/manifest.json > /dev/null
+
+      - name: Upload to gs://$BUCKET/$APPLET_SLUG/
+        run: |
+          gcloud storage rsync site/ "gs://${BUCKET}/${APPLET_SLUG}/" \
+            --recursive --delete-unmatched-destination-objects
+
+      - name: Trigger hub rebuild
+        if: ${{ secrets.WEBSITE_DISPATCH_TOKEN != '' }}
+        run: |
+          curl -fsSL -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.WEBSITE_DISPATCH_TOKEN }}" \
+            https://api.github.com/repos/lukesarfas/luke.sarfas.com/dispatches \
+            -d '{"event_type":"project-updated","client_payload":{"project":"'${APPLET_SLUG}'"}}'

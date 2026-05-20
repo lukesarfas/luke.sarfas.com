@@ -1,0 +1,78 @@
+---
+import Base from "~/layouts/Base.astro";
+import { getCollection, type CollectionEntry } from "astro:content";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
+  return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+
+interface Props {
+  post: CollectionEntry<"blog">;
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+
+const fmt = (d: Date) =>
+  d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+---
+
+<Base title={`${post.data.title} — Luke Sarfas`} description={post.data.description}>
+  <article class="post">
+    <a href="/blog/" class="backlink">← Blog</a>
+    <header class="detail-head" style="margin-top:1rem">
+      <span class="eyebrow">Post</span>
+      <h1>{post.data.title}</h1>
+      <div class="detail-meta">
+        <time datetime={post.data.date.toISOString()}>{fmt(post.data.date)}</time>
+        {post.data.updated && (
+          <span>· updated {fmt(post.data.updated)}</span>
+        )}
+        {post.data.tags.length > 0 && (
+          <span class="tags">
+            {post.data.tags.map((t) => <span class="tag">{t}</span>)}
+          </span>
+        )}
+      </div>
+    </header>
+
+    <div class="detail-body post-body">
+      <Content />
+    </div>
+  </article>
+</Base>
+
+<style>
+  .post-body :global(h2) {
+    margin-top: 2rem;
+    margin-bottom: 0.6rem;
+  }
+  .post-body :global(h3) {
+    margin-top: 1.5rem;
+    margin-bottom: 0.4rem;
+  }
+  .post-body :global(p),
+  .post-body :global(ul),
+  .post-body :global(ol),
+  .post-body :global(pre),
+  .post-body :global(blockquote) {
+    margin-bottom: 1rem;
+  }
+  .post-body :global(pre) {
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg-2);
+    overflow-x: auto;
+    font-size: 0.9rem;
+  }
+  .post-body :global(code) {
+    font-size: 0.92em;
+  }
+  .post-body :global(blockquote) {
+    border-left: 3px solid var(--border-strong);
+    padding-left: 1rem;
+    color: var(--muted);
+  }
+</style>

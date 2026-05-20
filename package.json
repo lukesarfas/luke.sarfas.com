@@ -10,9 +10,13 @@
     "dev": "npm --workspace luke.sarfas.com run dev",
     "dev:hub": "npm --workspace luke.sarfas.com run dev",
     "dev:lickme": "npm --workspace lickme-site run dev",
-    "build": "npm --workspace luke.sarfas.com run build && npm --workspace lickme-site run build",
+    "dev:thinkwell": "npm --workspace thinkwell-site run dev",
+    "build": "npm run build:lickme && npm run build:thinkwell && npm run sync:sites && npm run build:hub",
     "build:hub": "npm --workspace luke.sarfas.com run build",
-    "build:lickme": "npm --workspace lickme-site run build"
+    "build:lickme": "npm --workspace lickme-site run build",
+    "build:thinkwell": "npm --workspace thinkwell-site run build",
+    "sync:sites": "node scripts/sync-sites.mjs",
+    "make-previews": "node scripts/make-previews.mjs"
   },
   "engines": {
     "node": ">=20"

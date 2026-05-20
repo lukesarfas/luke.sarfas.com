@@ -1,0 +1,83 @@
+---
+import Base from "~/layouts/Base.astro";
+
+const roles: Array<{
+  company: string;
+  title: string;
+  period: string;
+  blurb: string;
+}> = [
+  // TODO: fill in roles, newest first
+  // { company: "Company", title: "Role", period: "2024 — present", blurb: "..." },
+];
+
+const linkedin = "https://www.linkedin.com/in/lukesarfas/"; // TODO: confirm URL
+---
+
+<Base title="Career — Luke Sarfas" description="Career, roles, and how to find me professionally.">
+  <section class="hero" style="padding-top:3rem;padding-bottom:0">
+    <span class="eyebrow">Career</span>
+    <h1>Career</h1>
+    <p class="lead">
+      The work side of things. Full history lives on LinkedIn; the highlights live here.
+    </p>
+    <div class="actions">
+      <a class="btn btn-primary" href={linkedin} rel="noreferrer">LinkedIn →</a>
+      <a class="btn" href="/contact">Get in touch</a>
+    </div>
+  </section>
+
+  <section class="section" style="margin-top:2.5rem">
+    <div class="section-head">
+      <h2>Roles</h2>
+    </div>
+    {roles.length === 0 ? (
+      <p class="muted">TODO: add roles to the <code>roles</code> array in <code>src/pages/career.astro</code>.</p>
+    ) : (
+      <ol class="timeline">
+        {roles.map((r) => (
+          <li>
+            <div class="when">{r.period}</div>
+            <div class="what">
+              <strong>{r.title}</strong> <span class="muted">— {r.company}</span>
+              <p>{r.blurb}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    )}
+  </section>
+</Base>
+
+<style>
+  .timeline {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 1rem;
+  }
+  .timeline li {
+    display: grid;
+    grid-template-columns: 12rem 1fr;
+    gap: 1.25rem;
+    padding: 1.1rem 1.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+  }
+  .when {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .what p {
+    color: var(--muted);
+    margin-top: 0.35rem;
+  }
+  @media (max-width: 640px) {
+    .timeline li {
+      grid-template-columns: 1fr;
+      gap: 0.4rem;
+    }
+  }
+</style>

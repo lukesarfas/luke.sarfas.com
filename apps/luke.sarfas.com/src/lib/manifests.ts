@@ -1,3 +1,7 @@
+import { readFile } from "node:fs/promises";
+import { resolve, dirname } from "node:path";
+import { existsSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import registry from "~/data/projects.json";
 
 export type ProjectStatus = "active" | "wip" | "archived";
@@ -18,17 +22,24 @@ export interface ProjectManifest {
   };
   preview?: string;
   accent?: string;
-  screenshot?: string;
+  applet?: boolean | string;
   tags?: string[];
 }
 
-interface RegistryEntry {
+export interface RegistryEntry {
   slug: string;
+  /** External URL to fetch manifest.json from. */
   manifestUrl?: string;
+  /** Path to a sibling app in this monorepo (e.g. "lickme"). Reads apps/<path>/public/manifest.json from disk. */
+  manifestPath?: string;
+  /** Inline fallback / override; takes lowest precedence. */
   manifest?: Partial<ProjectManifest>;
 }
 
 const TIMEOUT_MS = 5000;
+const __dirname = dirname(fileURLToPath(import.meta.url));
+// src/lib -> src -> apps/luke.sarfas.com -> apps -> monorepo root
+const MONOREPO_ROOT = resolve(__dirname, "../../../..");
 
 async function fetchWithTimeout(url: string): Promise<Response> {
   const controller = new AbortController();
@@ -40,22 +51,46 @@ async function fetchWithTimeout(url: string): Promise<Response> {
   }
 }
 
+async function readSiblingManifest(path: string): Promise<Partial<ProjectManifest> | null> {
+  const abs = resolve(MONOREPO_ROOT, "apps", path, "public", "manifest.json");
+  if (!existsSync(abs)) return null;
+  const raw = await readFile(abs, "utf8");
+  return JSON.parse(raw) as Partial<ProjectManifest>;
+}
+
 async function loadOne(entry: RegistryEntry): Promise<ProjectManifest | null> {
   const inline = entry.manifest ?? {};
+  let remote: Partial<ProjectManifest> | null = null;
 
-  if (entry.manifestUrl) {
+  if (entry.manifestPath) {
+    try {
+      remote = await readSiblingManifest(entry.manifestPath);
+      if (!remote) console.warn(`[manifests] ${entry.slug}: no manifest at apps/${entry.manifestPath}/public/manifest.json`);
+    } catch (err) {
+      console.warn(`[manifests] ${entry.slug} read failed: ${(err as Error).message}`);
+    }
+  } else if (entry.manifestUrl) {
     try {
       const res = await fetchWithTimeout(entry.manifestUrl);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const remote = (await res.json()) as Partial<ProjectManifest>;
-      return { ...inline, ...remote, slug: entry.slug } as ProjectManifest;
+      remote = (await res.json()) as Partial<ProjectManifest>;
     } catch (err) {
       console.warn(`[manifests] ${entry.slug} fetch failed: ${(err as Error).message}`);
     }
   }
 
-  if (!inline.name) return null;
-  return { ...inline, slug: entry.slug } as ProjectManifest;
+  const merged = { ...inline, ...(remote ?? {}), slug: entry.slug } as ProjectManifest;
+  if (!merged.name) return null;
+
+  // Auto-wire preview + applet from sibling-app convention if not set.
+  if (!merged.preview && entry.manifestPath) {
+    merged.preview = `/previews/${entry.manifestPath}.png`;
+  }
+  if (merged.applet === undefined && entry.manifestPath) {
+    merged.applet = `/sites/${entry.manifestPath}/`;
+  }
+
+  return merged;
 }
 
 export async function loadAll(): Promise<ProjectManifest[]> {
