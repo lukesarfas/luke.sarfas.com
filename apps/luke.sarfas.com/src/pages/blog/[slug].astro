@@ -151,8 +151,14 @@ const jsonLd = [
     margin: 0;
   }
   .post-body {
-    font-size: 1.08rem;
-    line-height: 1.78;
+    font-size: 1.05rem;
+    line-height: 1.75;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+  .post-body :global(pre),
+  .post-body :global(img) {
+    max-width: 100%;
   }
   .post-body :global(h2) {
     font-family: var(--font-serif);

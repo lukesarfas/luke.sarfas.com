@@ -124,7 +124,7 @@ const jsonLd = [
 <style>
   .latest-card {
     display: block;
-    padding: 2rem 2.25rem;
+    padding: 1.5rem 1.4rem;
     border: 1px solid var(--border);
     border-radius: var(--radius-xl);
     background: var(--card);
@@ -190,4 +190,10 @@ const jsonLd = [
     transition: gap 220ms var(--ease);
   }
   .latest-card:hover .latest-read { gap: 0.65rem; }
+  @media (min-width: 720px) {
+    .latest-card { padding: 2rem 2.25rem; }
+  }
+  .latest-meta {
+    flex-wrap: wrap;
+  }
 </style>
