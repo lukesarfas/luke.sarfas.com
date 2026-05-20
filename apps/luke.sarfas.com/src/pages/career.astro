@@ -4,25 +4,35 @@ import Base from "~/layouts/Base.astro";
 const roles: Array<{
   company: string;
   title: string;
-  period: string;
-  blurb: string;
+  status: "current" | "past";
+  blurb?: string;
 }> = [
-  // TODO: fill in roles, newest first
-  // { company: "Company", title: "Role", period: "2024 — present", blurb: "..." },
+  {
+    company: "Google",
+    title: "Software Engineer",
+    status: "current",
+  },
+  {
+    company: "Amazon",
+    title: "Software Development Engineer",
+    status: "past",
+    blurb: "Machine learning for forecasting metrics in AWS CloudWatch.",
+  },
 ];
 
-const linkedin = "https://www.linkedin.com/in/lukesarfas/"; // TODO: confirm URL
+const linkedin = "https://www.linkedin.com/in/lukesarfas/";
 ---
 
-<Base title="Career — Luke Sarfas" description="Career, roles, and how to find me professionally.">
+<Base title="Career · Luke Sarfas" description="Software engineering and machine learning. Currently Google, previously Amazon.">
   <section class="hero" style="padding-top:3rem;padding-bottom:0">
     <span class="eyebrow">Career</span>
     <h1>Career</h1>
     <p class="lead">
-      The work side of things. Full history lives on LinkedIn; the highlights live here.
+      Software engineering and machine learning. Currently at Google,
+      previously Amazon. Based in London, open to interesting things.
     </p>
     <div class="actions">
-      <a class="btn btn-primary" href={linkedin} rel="noreferrer">LinkedIn →</a>
+      <a class="btn btn-primary" href={linkedin} rel="noreferrer">LinkedIn ↗</a>
       <a class="btn" href="/contact">Get in touch</a>
     </div>
   </section>
@@ -31,53 +41,60 @@ const linkedin = "https://www.linkedin.com/in/lukesarfas/"; // TODO: confirm URL
     <div class="section-head">
       <h2>Roles</h2>
     </div>
-    {roles.length === 0 ? (
-      <p class="muted">TODO: add roles to the <code>roles</code> array in <code>src/pages/career.astro</code>.</p>
-    ) : (
-      <ol class="timeline">
-        {roles.map((r) => (
-          <li>
-            <div class="when">{r.period}</div>
-            <div class="what">
-              <strong>{r.title}</strong> <span class="muted">— {r.company}</span>
-              <p>{r.blurb}</p>
-            </div>
-          </li>
-        ))}
-      </ol>
-    )}
+    <ul class="roles">
+      {roles.map((r) => (
+        <li>
+          <div class="role-head">
+            <strong>{r.title}</strong>
+            <span class="muted">· {r.company}</span>
+            {r.status === "current" && <span class="badge">Current</span>}
+          </div>
+          {r.blurb && <p class="muted">{r.blurb}</p>}
+        </li>
+      ))}
+    </ul>
   </section>
 </Base>
 
 <style>
-  .timeline {
+  .roles {
     list-style: none;
     padding: 0;
     margin: 0;
     display: grid;
-    gap: 1rem;
+    gap: 0.85rem;
   }
-  .timeline li {
-    display: grid;
-    grid-template-columns: 12rem 1fr;
-    gap: 1.25rem;
+  .roles li {
     padding: 1.1rem 1.25rem;
     border: 1px solid var(--border);
     border-radius: var(--radius);
     background: var(--card);
+    transition: border-color 200ms var(--ease), background 200ms var(--ease);
   }
-  .when {
+  .roles li:hover {
+    border-color: var(--border-strong);
+    background: var(--card-hover);
+  }
+  .role-head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .roles p {
+    margin-top: 0.4rem;
     color: var(--muted);
-    font-size: 0.9rem;
   }
-  .what p {
+  .badge {
+    margin-left: auto;
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0.2rem 0.55rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg-2);
     color: var(--muted);
-    margin-top: 0.35rem;
-  }
-  @media (max-width: 640px) {
-    .timeline li {
-      grid-template-columns: 1fr;
-      gap: 0.4rem;
-    }
   }
 </style>
