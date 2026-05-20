@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 570">
+  <rect width="270" height="570" fill="#FBF5EE"/>
+  <text x="20" y="60" font-family="ui-serif, Georgia, serif" font-size="22" fill="#2A2422">Insights</text>
+  <text x="20" y="82" font-family="-apple-system" font-size="12" fill="#6B5E57">This week</text>
+  <g transform="translate(20,110)">
+    <rect width="230" height="110" rx="16" fill="#FFFFFF" stroke="#E9DED4"/>
+    <text x="16" y="26" font-family="-apple-system" font-size="13" font-weight="600" fill="#2A2422">Mood</text>
+    <polyline points="16,82 50,70 84,60 118,68 152,52 186,58 220,45"
+      fill="none" stroke="#E8A384" stroke-width="2.5" stroke-linecap="round"/>
+    <g fill="#E8A384">
+      <circle cx="16" cy="82" r="3"/><circle cx="50" cy="70" r="3"/>
+      <circle cx="84" cy="60" r="3"/><circle cx="118" cy="68" r="3"/>
+      <circle cx="152" cy="52" r="3"/><circle cx="186" cy="58" r="3"/>
+      <circle cx="220" cy="45" r="3"/>
+    </g>
+  </g>
+  <g transform="translate(20,240)">
+    <rect width="230" height="80" rx="16" fill="#FFFFFF" stroke="#E9DED4"/>
+    <text x="16" y="26" font-family="-apple-system" font-size="13" font-weight="600" fill="#2A2422">Who came up most</text>
+    <text x="16" y="50" font-family="-apple-system" font-size="12" fill="#6B5E57">Mia · 4 mentions</text>
+    <text x="16" y="68" font-family="-apple-system" font-size="12" fill="#6B5E57">Dad · 2 mentions</text>
+  </g>
+  <g transform="translate(20,340)">
+    <rect width="230" height="80" rx="16" fill="#FFFFFF" stroke="#E9DED4"/>
+    <text x="16" y="26" font-family="-apple-system" font-size="13" font-weight="600" fill="#2A2422">Places</text>
+    <text x="16" y="50" font-family="-apple-system" font-size="12" fill="#6B5E57">Canal · 3 walks</text>
+    <text x="16" y="68" font-family="-apple-system" font-size="12" fill="#6B5E57">Prufrock · 2 mornings</text>
+  </g>
+</svg>

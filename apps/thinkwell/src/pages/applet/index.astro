@@ -1,0 +1,142 @@
+---
+const title = "ThinkWell — embed";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>{title}</title>
+    <style>
+      :root {
+        --bg: #fbf5ee;
+        --raised: #fff;
+        --text: #2a2422;
+        --text-secondary: #6b5e57;
+        --accent: #e8a384;
+        --accent-strong: #b56942;
+        --line: #e9ded4;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #171311;
+          --raised: #201b18;
+          --text: #f2e7dc;
+          --text-secondary: #b6a498;
+          --accent: #e8a384;
+          --accent-strong: #f2b79a;
+          --line: #2e2722;
+        }
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; padding: 0; height: 100%; }
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 24px;
+        line-height: 1.5;
+      }
+      .stage {
+        max-width: 600px;
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 600;
+        font-size: 16px;
+        color: var(--text);
+      }
+      .brand img {
+        width: 26px;
+        height: 26px;
+        border-radius: 6px;
+        display: block;
+      }
+      .eyebrow {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--text-secondary);
+      }
+      h1 {
+        font-family: ui-serif, Georgia, "Iowan Old Style", serif;
+        font-size: clamp(28px, 5vw, 40px);
+        line-height: 1.1;
+        margin: 0;
+        letter-spacing: -0.01em;
+      }
+      p {
+        margin: 0;
+        font-size: 15px;
+        color: var(--text-secondary);
+        max-width: 50ch;
+      }
+      .cta {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        border-radius: 10px;
+        background: var(--accent);
+        color: #fff;
+        font-size: 14px;
+        font-weight: 600;
+        text-decoration: none;
+        align-self: flex-start;
+        border: 1px solid color-mix(in srgb, var(--accent) 70%, black);
+      }
+      .cta:hover {
+        background: var(--accent-strong);
+      }
+      .note {
+        font-size: 12px;
+        color: var(--text-secondary);
+        opacity: 0.8;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <span class="brand">
+        <img src="/assets/app-icon.png" alt="" width="26" height="26" />
+        ThinkWell
+      </span>
+      <span class="eyebrow">Private by default · Web &amp; iOS</span>
+      <h1>A quieter place to think.</h1>
+      <p>
+        A journal that listens. Write freely — ThinkWell quietly weaves your
+        entries into a map of the people, places, and moments that shape your
+        life.
+      </p>
+      <a
+        class="cta"
+        href="https://thinkwelljournal.com"
+        target="_top"
+        rel="noopener"
+      >
+        Visit thinkwelljournal.com →
+      </a>
+      <span class="note">No ads. No tracking. Entries never train a model.</span>
+    </div>
+    <script>
+      try {
+        window.parent?.postMessage({ type: "applet:ready" }, "*");
+      } catch {}
+    </script>
+  </body>
+</html>

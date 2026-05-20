@@ -1,22 +1,10 @@
 [
   {
     "slug": "thinkwell",
-    "manifest": {
-      "name": "ThinkWell",
-      "tagline": "AI-powered personal journaling — iOS and web.",
-      "description": "ThinkWell turns unstructured journal entries into a private, searchable thinking partner. Voice or text in, themes and through-lines out. Built on a tiered Bedrock backend (Haiku → Sonnet escalation) with biometric-locked local storage and a privacy-first sync model.",
-      "status": "active",
-      "tags": ["ai", "ios", "react-native", "aws", "bedrock"]
-    }
+    "manifestPath": "thinkwell"
   },
   {
     "slug": "lickme",
-    "manifest": {
-      "name": "LickMe",
-      "tagline": "Pinterest for jazz, rock, and blues licks — with video receipts.",
-      "description": "LickMe is a web app where musicians publish short improvisational phrases (\"licks\") as notation and optional audio, and other players upload short videos demonstrating those licks inside real pieces of music. Browse by tag, key, or instrument; follow players you like; accumulate video evidence on any lick.",
-      "status": "wip",
-      "tags": ["nextjs", "music", "video", "hono", "postgres"]
-    }
+    "manifestPath": "lickme"
   }
 ]

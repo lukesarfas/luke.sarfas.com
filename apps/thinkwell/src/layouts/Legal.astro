@@ -1,0 +1,78 @@
+---
+import Base from "~/layouts/Base.astro";
+import Header from "~/components/Header.astro";
+import Footer from "~/components/Footer.astro";
+
+interface Props {
+  frontmatter: {
+    title: string;
+    updated?: string;
+  };
+}
+const { frontmatter } = Astro.props;
+const path = Astro.url.pathname;
+---
+
+<Base
+  title={`${frontmatter.title} — ThinkWell`}
+  description={`${frontmatter.title} for ThinkWell.`}
+  path={path}
+>
+  <Header />
+  <main>
+    <article class="container legal-prose">
+      <slot />
+    </article>
+  </main>
+  <Footer />
+</Base>
+
+<style is:global>
+  .legal-prose {
+    max-width: 720px;
+    padding-top: 3rem;
+    padding-bottom: 4rem;
+    font-family: var(--font-ui);
+    color: var(--text);
+    line-height: 1.7;
+  }
+  .legal-prose h1 {
+    font-family: var(--font-serif);
+    font-size: 2rem;
+    margin: 0 0 0.5rem;
+    color: var(--text);
+  }
+  .legal-prose h2 {
+    font-family: var(--font-serif);
+    font-size: 1.4rem;
+    margin: 2rem 0 0.5rem;
+    color: var(--text);
+  }
+  .legal-prose h3 {
+    font-size: 1.05rem;
+    margin: 1.5rem 0 0.5rem;
+    color: var(--text);
+  }
+  .legal-prose p,
+  .legal-prose ul,
+  .legal-prose ol {
+    margin: 0 0 1rem;
+    color: var(--text-secondary);
+  }
+  .legal-prose ul,
+  .legal-prose ol {
+    padding-left: 1.25rem;
+  }
+  .legal-prose li {
+    margin-bottom: 0.35rem;
+  }
+  .legal-prose em {
+    color: var(--text-muted);
+  }
+  .legal-prose strong {
+    color: var(--text);
+  }
+  .legal-prose a {
+    color: var(--accent-strong);
+  }
+</style>

@@ -1,0 +1,118 @@
+---
+import { getCollection } from "astro:content";
+import Base from "~/layouts/Base.astro";
+import Header from "~/components/Header.astro";
+import Footer from "~/components/Footer.astro";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+const title = "Journal, quietly. — ThinkWell";
+const description =
+  "Notes on how to journal, and why it's worth the fifteen minutes.";
+---
+
+<Base title={title} description={description} path="/blog/">
+  <Header />
+  <main>
+    <section class="container blog-index">
+      <h1>Journal, quietly.</h1>
+      <p class="lead">
+        Notes on how to journal, and why it's worth the fifteen minutes.
+      </p>
+
+      <ul class="post-list">
+        {
+          posts.map((post) => {
+            const formattedDate = post.data.date.toLocaleDateString("en-GB", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            });
+            return (
+              <li>
+                <a href={`/blog/${post.slug}/`}>
+                  <time datetime={post.data.date.toISOString()}>
+                    {formattedDate}
+                  </time>
+                  <h2>{post.data.title}</h2>
+                  {post.data.excerpt && <p>{post.data.excerpt}</p>}
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </section>
+  </main>
+  <Footer />
+</Base>
+
+<style>
+  .blog-index {
+    max-width: 720px;
+    padding-top: 3rem;
+    padding-bottom: 4rem;
+    font-family: var(--font-ui);
+    color: var(--text);
+  }
+  .blog-index h1 {
+    font-family: var(--font-serif);
+    font-size: 2.4rem;
+    letter-spacing: -0.01em;
+    line-height: 1.1;
+    margin: 0 0 0.4rem;
+    color: var(--text);
+  }
+  .blog-index .lead {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+    margin: 0 0 2.5rem;
+  }
+  .post-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 1rem;
+  }
+  .post-list li a {
+    display: block;
+    padding: 1.25rem 1.4rem;
+    background: var(--raised);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    color: var(--text);
+    transition:
+      transform 200ms,
+      box-shadow 200ms,
+      border-color 200ms;
+  }
+  .post-list li a:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lift);
+    border-color: var(--accent-soft);
+    text-decoration: none;
+  }
+  .post-list time {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 0.35rem;
+  }
+  .post-list h2 {
+    font-family: var(--font-serif);
+    font-size: 1.25rem;
+    line-height: 1.25;
+    margin: 0 0 0.4rem;
+    color: var(--text);
+  }
+  .post-list p {
+    color: var(--text-secondary);
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+</style>

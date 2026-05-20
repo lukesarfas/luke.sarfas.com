@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 570">
+  <rect width="270" height="570" fill="#FBF5EE"/>
+  <text x="20" y="60" font-family="ui-serif, Georgia, serif" font-size="22" fill="#2A2422">Life Map</text>
+  <g stroke="#E9DED4" stroke-width="1">
+    <line x1="135" y1="280" x2="80" y2="200"/>
+    <line x1="135" y1="280" x2="195" y2="200"/>
+    <line x1="135" y1="280" x2="70" y2="380"/>
+    <line x1="135" y1="280" x2="205" y2="370"/>
+    <line x1="135" y1="280" x2="140" y2="440"/>
+  </g>
+  <circle cx="135" cy="280" r="34" fill="#E8A384"/>
+  <text x="135" y="286" text-anchor="middle" fill="#FFFFFF" font-family="-apple-system" font-size="13" font-weight="600">You</text>
+  <g font-family="-apple-system" font-size="11" fill="#2A2422">
+    <circle cx="80" cy="200" r="22" fill="#FFFFFF" stroke="#E9DED4"/>
+    <text x="80" y="204" text-anchor="middle">Mia</text>
+    <circle cx="195" cy="200" r="22" fill="#FFFFFF" stroke="#E9DED4"/>
+    <text x="195" y="204" text-anchor="middle">Dad</text>
+    <circle cx="70" cy="380" r="22" fill="#FFFFFF" stroke="#E9DED4"/>
+    <text x="70" y="384" text-anchor="middle">Work</text>
+    <circle cx="205" cy="370" r="22" fill="#FFFFFF" stroke="#E9DED4"/>
+    <text x="205" y="374" text-anchor="middle">Canal</text>
+    <circle cx="140" cy="440" r="22" fill="#FFFFFF" stroke="#E9DED4"/>
+    <text x="140" y="444" text-anchor="middle">Books</text>
+  </g>
+</svg>

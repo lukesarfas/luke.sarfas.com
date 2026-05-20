@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 570">
+  <rect width="270" height="570" fill="#FBF5EE"/>
+  <text x="20" y="60" font-family="ui-serif, Georgia, serif" font-size="22" fill="#2A2422">Reflect</text>
+  <text x="20" y="82" font-family="-apple-system" font-size="12" fill="#6B5E57">A short walk back through your week</text>
+  <g transform="translate(20,110)">
+    <rect width="230" height="360" rx="20" fill="#FFFFFF" stroke="#E9DED4"/>
+    <text x="20" y="40" font-family="-apple-system" font-size="13" font-weight="600" fill="#B56942">Thursday</text>
+    <text x="20" y="70" font-family="ui-serif, Georgia, serif" font-size="16" fill="#2A2422">
+      <tspan x="20" dy="0">When Dad called, you said he</tspan>
+      <tspan x="20" dy="22">sounded tired. Has that been</tspan>
+      <tspan x="20" dy="22">on your mind this weekend?</tspan>
+    </text>
+    <rect x="20" y="200" width="190" height="42" rx="12" fill="#FBF5EE" stroke="#E9DED4"/>
+    <text x="32" y="226" font-family="-apple-system" font-size="13" fill="#A99A90">Say a little more…</text>
+    <rect x="20" y="300" width="90" height="36" rx="18" fill="#2A2422"/>
+    <text x="65" y="323" text-anchor="middle" font-family="-apple-system" font-size="13" font-weight="600" fill="#FBF5EE">Continue</text>
+  </g>
+</svg>

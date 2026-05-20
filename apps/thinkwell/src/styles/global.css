@@ -1,0 +1,535 @@
+/* ThinkWell marketing — palette + typography mirrored from src/ui/theme/tokens */
+:root {
+  --bg: #FBF5EE;
+  --raised: #FFFFFF;
+  --sunken: #F5ECE1;
+  --text: #2A2422;
+  --text-secondary: #6B5E57;
+  --text-muted: #A99A90;
+  --accent: #E8A384;
+  --accent-soft: #F7D8C4;
+  --accent-strong: #B56942;
+  --line: #E9DED4;
+  --focus: #D98A65;
+  --shadow-card: 0 1px 6px rgba(42, 36, 34, 0.04);
+  --shadow-lift: 0 3px 12px rgba(42, 36, 34, 0.08);
+  --shadow-modal: 0 10px 28px rgba(42, 36, 34, 0.14);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+  --radius-xl: 24px;
+  --radius-pill: 999px;
+  --font-ui: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif: ui-serif, Georgia, "Iowan Old Style", serif;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #171311;
+    --raised: #201B18;
+    --sunken: #100D0B;
+    --text: #F2E7DC;
+    --text-secondary: #B6A498;
+    --text-muted: #6F6157;
+    --accent: #E8A384;
+    --accent-soft: #3A2C25;
+    --accent-strong: #F2B79A;
+    --line: #2E2722;
+    --focus: #F2B79A;
+    --shadow-card: 0 1px 8px rgba(0, 0, 0, 0.30);
+    --shadow-lift: 0 4px 14px rgba(0, 0, 0, 0.40);
+    --shadow-modal: 0 12px 32px rgba(0, 0, 0, 0.55);
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font-ui);
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent-strong); text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { max-width: 100%; display: block; }
+
+.container { width: 100%; max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+
+/* --- Nav --- */
+.nav {
+  position: sticky; top: 0; z-index: 10;
+  backdrop-filter: saturate(180%) blur(12px);
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  border-bottom: 1px solid var(--line);
+}
+/*
+ * .nav-inner also carries .container, so it must preserve the
+ * container's 24px horizontal gutter. Writing shorthand padding here
+ * (16px 0) clobbers the horizontal value to 0, pushing the brand
+ * flush-left and clipping 'Blog' against the right edge on narrow
+ * viewports. Spell both axes explicitly.
+ */
+.nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 17px; color: var(--text); }
+.brand-mark {
+  width: 28px; height: 28px; border-radius: 7px;
+  display: block;
+  box-shadow: var(--shadow-card);
+}
+.nav-links { display: flex; gap: 24px; align-items: center; }
+.nav-links a { color: var(--text-secondary); font-size: 15px; font-weight: 500; }
+.nav-links a:hover { color: var(--text); text-decoration: none; }
+.btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 8px; padding: 10px 18px;
+  border-radius: var(--radius-pill);
+  font-weight: 600; font-size: 15px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+.btn-primary { background: var(--text); color: var(--bg); }
+.btn-primary:hover { transform: translateY(-1px); box-shadow: var(--shadow-lift); text-decoration: none; }
+.btn-ghost { background: transparent; color: var(--text); border-color: var(--line); }
+.btn-ghost:hover { background: var(--sunken); text-decoration: none; }
+/* "Coming soon" pill — visually a ghost button but non-interactive.
+   Rendered as <span>, so there's nothing to click; styled dimmer to
+   read as "not yet available" rather than "try me". */
+.btn-soon {
+  background: transparent;
+  color: var(--text-muted);
+  border-color: var(--line);
+  cursor: default;
+  opacity: 0.75;
+}
+.btn-soon:hover { background: transparent; }
+.btn-open-app { display: none; }
+@media (min-width: 820px) { .btn-open-app { display: inline-flex; } }
+.btn-coming-soon { opacity: 0.45; cursor: default; pointer-events: none; }
+
+/* --- Hero --- */
+.hero { padding: 72px 0 48px; }
+.hero-grid { display: grid; grid-template-columns: 1fr; gap: 48px; align-items: center; }
+@media (min-width: 960px) { .hero-grid { grid-template-columns: 1.1fr 1fr; gap: 72px; } }
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 12px; border-radius: var(--radius-pill);
+  background: var(--accent-soft); color: var(--accent-strong);
+  font-size: 13px; font-weight: 600; letter-spacing: 0.02em;
+  margin-bottom: 20px;
+}
+.eyebrow::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--accent-strong); }
+h1.hero-title {
+  font-family: var(--font-serif);
+  font-size: clamp(36px, 5.2vw, 58px);
+  line-height: 1.08; margin: 0 0 20px; letter-spacing: -0.02em;
+  font-weight: 500;
+}
+.hero-sub { font-size: 18px; color: var(--text-secondary); margin: 0 0 28px; max-width: 520px; }
+.hero-cta { display: flex; gap: 12px; flex-wrap: wrap; }
+.hero-note { margin-top: 16px; font-size: 13px; color: var(--text-muted); }
+
+/* Device mockup — a rounded cream card with the screenshot inside,
+   no iPhone bezel. The raw screenshots are plain web-viewport
+   captures (390x844 @2x) with no iOS chrome, and we don't draw any
+   here either (no Dynamic Island, no status bar, no home indicator),
+   so the mockup honestly represents what the app actually renders. */
+.device-stage { position: relative; display: flex; justify-content: center; perspective: 1200px; }
+.device {
+  --device-w: 260px;
+  --screen-bg: #F5ECE1;
+  --screen-radius: calc(var(--device-w) * 0.12); /* ≈ 47/390 */
+
+  width: var(--device-w);
+  /* Aspect ratio matches the source screenshots. Hand-captured iOS
+     simulator shots are 1170×2532 at 3× (390×844 CSS), the device's
+     native portrait aspect. */
+  aspect-ratio: 390 / 844;
+  /* No bezel — the "phone" reads as a rounded cream card with the
+     screenshot bleeding into it, rather than a literal black iPhone
+     frame. Outer radius matches the inner screen radius so the edge
+     is continuous. */
+  border-radius: var(--screen-radius);
+  box-shadow: var(--shadow-modal);
+  animation: float 7s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+  background: var(--screen-bg);
+}
+.device-screen {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--screen-radius);
+  background: var(--screen-bg);
+  overflow: hidden;
+  display: block;
+}
+.device-screen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+/* Dynamic Island — the pill-shaped camera/sensor housing on iPhone
+   14 Pro and later. Positioned over the screenshot's own status bar
+   (time + wifi + battery), where it sits on a real device. Sized in
+   percentages of the 390×844 reference screen so it scales with
+   whatever --device-w the card ends up at. Real device: ~126×35 pt
+   at 11 pt from top → 32% × 4.1% at 1.3% top. */
+.device-screen::after {
+  content: "";
+  position: absolute;
+  top: 1.3%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32%;
+  height: 4.1%;
+  background: #0a0a0a;
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: 2;
+}
+@media (prefers-color-scheme: dark) {
+  .device { --screen-bg: var(--bg); }
+}
+.device.rear {
+  position: absolute; top: 24px; left: calc(50% - 180px);
+  transform: rotate(-8deg) scale(0.92);
+  opacity: 0.6; filter: blur(0.4px);
+  animation: float 9s ease-in-out infinite reverse;
+  animation-delay: -2s;
+}
+.device.rear-right {
+  position: absolute; top: 24px; right: calc(50% - 180px);
+  transform: rotate(8deg) scale(0.92);
+  opacity: 0.6; filter: blur(0.4px);
+  animation: float 8s ease-in-out infinite;
+  animation-delay: -4s;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-10px) rotate(-0.6deg); }
+}
+.device.rear { animation-name: float-rear; }
+@keyframes float-rear {
+  0%, 100% { transform: rotate(-8deg) scale(0.92) translateY(0); }
+  50% { transform: rotate(-7deg) scale(0.92) translateY(-8px); }
+}
+.device.rear-right { animation-name: float-rear-right; }
+@keyframes float-rear-right {
+  0%, 100% { transform: rotate(8deg) scale(0.92) translateY(0); }
+  50% { transform: rotate(7deg) scale(0.92) translateY(-8px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .device, .device.rear, .device.rear-right { animation: none; }
+}
+
+/* --- Sections --- */
+section { padding: 72px 0; }
+.section-title {
+  font-family: var(--font-serif);
+  font-size: clamp(28px, 3.6vw, 40px);
+  line-height: 1.15; letter-spacing: -0.015em;
+  margin: 0 0 12px; font-weight: 500;
+}
+.section-lead { font-size: 17px; color: var(--text-secondary); margin: 0 0 40px; max-width: 620px; }
+
+/* Features grid */
+.features { display: grid; gap: 20px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+.feature {
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+  transition: transform 240ms ease, box-shadow 240ms ease;
+}
+.feature:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
+.feature-icon {
+  width: 36px; height: 36px; border-radius: var(--radius-md);
+  background: var(--accent-soft); color: var(--accent-strong);
+  display: inline-flex; align-items: center; justify-content: center;
+  margin-bottom: 14px; font-size: 20px;
+}
+.feature h3 { margin: 0 0 6px; font-size: 17px; font-weight: 600; }
+.feature p { margin: 0; color: var(--text-secondary); font-size: 15px; }
+
+/* Screenshot gallery */
+.gallery {
+  background: var(--sunken);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+.gallery-track {
+  display: flex; gap: 24px; overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 8px 4px 24px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+.gallery-track::-webkit-scrollbar { height: 8px; }
+.gallery-track::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+.gallery-card {
+  flex: 0 0 auto;
+  width: 260px;
+  scroll-snap-align: start;
+}
+/* Gallery phone inherits the same cream-screen mock as the hero
+   .device, just sized for the horizontal scroller. */
+.gallery-phone {
+  --device-w: 260px;
+  --screen-bg: #F5ECE1;
+  --screen-radius: calc(var(--device-w) * 0.12);
+
+  width: var(--device-w);
+  /* Match the source screenshots' 390×844 aspect. */
+  aspect-ratio: 390 / 844;
+  /* No bezel — same rationale as .device. Outer radius = inner
+     radius so the edge is continuous. */
+  border-radius: var(--screen-radius);
+  box-shadow: var(--shadow-lift);
+  overflow: hidden;
+  background: var(--screen-bg);
+  position: relative;
+}
+.gallery-phone-screen {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--screen-radius);
+  background: var(--screen-bg);
+  overflow: hidden;
+  display: block;
+}
+/* Dynamic Island on the gallery cards — identical geometry to
+   .device-screen::after. See that rule for rationale. */
+.gallery-phone-screen::after {
+  content: "";
+  position: absolute;
+  top: 1.3%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 32%;
+  height: 4.1%;
+  background: #0a0a0a;
+  border-radius: 999px;
+  pointer-events: none;
+  z-index: 2;
+}
+.gallery-phone img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  background: var(--screen-bg);
+  display: block;
+}
+@media (prefers-color-scheme: dark) {
+  .gallery-phone { --screen-bg: var(--bg); }
+}
+.gallery-caption {
+  margin-top: 14px; text-align: center;
+  font-size: 14px; color: var(--text-secondary); font-weight: 500;
+}
+
+/* Blog list */
+.blog-index { padding-top: 48px; }
+.post-list { display: grid; gap: 16px; }
+.post-card {
+  display: block; padding: 24px;
+  background: var(--raised); border: 1px solid var(--line);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-card);
+  transition: transform 200ms ease, box-shadow 200ms ease;
+  color: inherit;
+}
+.post-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); text-decoration: none; }
+.post-card h3 {
+  margin: 0 0 6px; font-family: var(--font-serif);
+  font-size: 22px; font-weight: 500; letter-spacing: -0.01em;
+}
+.post-card p { margin: 0 0 10px; color: var(--text-secondary); font-size: 15px; }
+.post-meta { font-size: 13px; color: var(--text-muted); }
+
+/* FAQ */
+.faq-list { max-width: 680px; margin: 48px auto 0; display: flex; flex-direction: column; gap: 12px; }
+.faq-item {
+  background: var(--raised);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 0;
+  overflow: hidden;
+}
+.faq-item summary {
+  padding: 20px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+}
+.faq-item summary::-webkit-details-marker { display: none; }
+.faq-item summary::after { content: '+'; color: var(--accent); font-size: 20px; font-weight: 400; flex-shrink: 0; margin-left: 12px; }
+.faq-item[open] summary::after { content: '−'; }
+.faq-item p { margin: 0; padding: 0 24px 20px; color: var(--text-secondary); font-size: 15px; line-height: 1.6; }
+
+/* CTA */
+.cta-banner {
+  text-align: center;
+  padding: 72px 24px;
+  background: linear-gradient(135deg, var(--accent-soft) 0%, var(--bg) 100%);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--line);
+}
+.cta-banner h2 {
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 3.4vw, 38px);
+  font-weight: 500; margin: 0 0 12px; letter-spacing: -0.015em;
+}
+.cta-banner p { color: var(--text-secondary); margin: 0 0 24px; font-size: 17px; }
+
+/* Footer */
+footer {
+  border-top: 1px solid var(--line);
+  padding: 40px 0 60px;
+  margin-top: 40px;
+  color: var(--text-muted); font-size: 14px;
+}
+.footer-row { display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; align-items: center; }
+.footer-links { display: flex; gap: 20px; }
+.footer-links a { color: var(--text-secondary); }
+
+/* Reveal on scroll */
+.reveal { opacity: 0; transform: translateY(12px); transition: opacity 600ms ease, transform 600ms ease; }
+.reveal.in { opacity: 1; transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* Blog post typography */
+article.post {
+  max-width: 680px; margin: 0 auto; padding: 48px 0 80px;
+}
+article.post h1 {
+  font-family: var(--font-serif); font-weight: 500;
+  font-size: clamp(32px, 4.2vw, 44px); line-height: 1.15;
+  letter-spacing: -0.015em; margin: 0 0 8px;
+}
+article.post .post-meta { margin-bottom: 32px; }
+article.post h2 {
+  font-family: var(--font-serif); font-weight: 500;
+  font-size: 24px; margin: 40px 0 12px;
+}
+article.post p, article.post li { font-size: 17px; line-height: 1.7; color: var(--text); }
+article.post blockquote {
+  border-left: 3px solid var(--accent); padding: 4px 16px;
+  color: var(--text-secondary); font-style: italic; margin: 24px 0;
+}
+article.post code {
+  background: var(--sunken); padding: 2px 6px; border-radius: 4px;
+  font-size: 0.92em;
+}
+
+/* --- Mobile polish --- */
+/*
+ * Safety net: prevent rogue child elements (e.g. the decorative rear
+ * device mockups in the hero, whose absolute positioning can leak
+ * past the viewport on narrow screens) from introducing horizontal
+ * scroll. Section content still scrolls vertically as normal.
+ */
+body { overflow-x: hidden; }
+
+/*
+ * Stack the hero CTAs full-width at every width where the hero is a
+ * single column (i.e. below the 960px hero-grid breakpoint). Below
+ * that, a horizontal 3-pill row wraps as 2+1, which looks off; full
+ * stacking is rhythmically cleaner.
+ */
+@media (max-width: 959px) {
+  .hero-cta {
+    flex-direction: column;
+    /* align-items: flex-start = pills sit at the left gutter, each
+       capped to 420px. On a 390px phone the cap is never hit and
+       pills fill the container; on an 800px tablet they sit neatly
+       left-aligned at a human-sized width. */
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .hero-cta .btn {
+    width: 100%;
+    max-width: 420px;
+    justify-content: center;
+  }
+  /* Centered variant (bottom CTA banner): centre the stack. */
+  .hero-cta[style*="center"] { align-items: center; }
+}
+
+@media (max-width: 720px) {
+  /* Tighter vertical rhythm on phones — desktop's 72px top+bottom
+     per section means three screenfuls of whitespace on a phone. */
+  .hero { padding: 40px 0 32px; }
+  section { padding: 48px 0; }
+
+  /* Hero grid collapses to a single column; shrink the gap too. */
+  .hero-grid { gap: 28px; }
+
+  /* Hide the two rear device mockups on mobile — they were
+     absolutely-positioned at ±180px from 50% and leaked past the
+     viewport, causing horizontal overflow. The front device is
+     enough of a preview; screenshots below give the full tour. */
+  .device.rear, .device.rear-right { display: none; }
+
+  /* Front device: centre, shrink, and stop floating. A moving
+     element at the top of every mobile render is more distracting
+     than delightful. */
+  .device-stage { min-height: 0; }
+  .device {
+    --device-w: 220px;
+    animation: none;
+    margin: 0 auto;
+  }
+
+  /* Eyebrow pill: the "Private by default · Web today · iOS & Android
+     coming soon" copy is long. Let it wrap gracefully, but make the
+     pill itself sit tighter against its content. */
+  .eyebrow {
+    font-size: 12px;
+    padding: 6px 10px;
+    line-height: 1.35;
+    max-width: 100%;
+  }
+
+  /* Bottom CTA banner: 72px 24px is cavernous on a 342px viewport. */
+  .cta-banner { padding: 40px 20px; border-radius: var(--radius-lg); }
+  .cta-banner p { font-size: 16px; }
+
+  /* Nav: tighten the gap between links so "Features" + "Blog"
+     don't get pushed off the right edge beside the brand. */
+  .nav-inner { padding: 12px 20px; }
+  .nav-links { gap: 16px; }
+  .nav-links a { font-size: 14px; }
+
+  /* Feature cards: tighter padding, smaller heading on mobile. */
+  .feature { padding: 20px; }
+  .feature h3 { font-size: 16px; }
+
+  /* Blog post reading on mobile. */
+  article.post { padding: 32px 0 56px; }
+  article.post p, article.post li { font-size: 16px; }
+
+  /* Footer: stack rows on mobile so links don't collide with copy. */
+  .footer-row { flex-direction: column; align-items: flex-start; gap: 12px; }
+}
+
+/* Very narrow phones (iPhone SE, 360–375px). One more step of
+   tightening — otherwise the hero headline overflows its line box. */
+@media (max-width: 400px) {
+  .container { padding: 0 20px; }
+  h1.hero-title { font-size: clamp(30px, 8vw, 40px); }
+  .hero-sub { font-size: 16px; }
+}

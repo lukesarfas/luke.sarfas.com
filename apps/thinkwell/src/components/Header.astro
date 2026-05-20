@@ -1,0 +1,30 @@
+---
+const path = Astro.url.pathname;
+---
+
+<header class="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="/">
+      <img
+        class="brand-mark"
+        src="/assets/app-icon.png"
+        alt=""
+        width="28"
+        height="28"
+      />
+      <span>ThinkWell</span>
+    </a>
+    <nav class="nav-links">
+      <a href="/#features">Features</a>
+      <a href="/blog/" class:list={[path.startsWith("/blog") && "active"]}>
+        Blog
+      </a>
+      <a
+        class="btn btn-ghost btn-open-app"
+        href="https://app.thinkwelljournal.com"
+      >
+        Open the app
+      </a>
+    </nav>
+  </div>
+</header>

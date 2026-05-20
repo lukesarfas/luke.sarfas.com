@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 570">
+  <rect width="270" height="570" fill="#FBF5EE"/>
+  <circle cx="135" cy="110" r="44" fill="#E8A384"/>
+  <text x="135" y="118" text-anchor="middle" font-family="-apple-system" font-size="22" font-weight="600" fill="#FFFFFF">M</text>
+  <text x="135" y="180" text-anchor="middle" font-family="ui-serif, Georgia, serif" font-size="22" fill="#2A2422">Mia</text>
+  <text x="135" y="202" text-anchor="middle" font-family="-apple-system" font-size="12" fill="#6B5E57">Partner · 142 mentions</text>
+  <g transform="translate(20,240)">
+    <rect width="230" height="80" rx="14" fill="#FFFFFF" stroke="#E9DED4"/>
+    <text x="16" y="22" font-family="-apple-system" font-size="12" font-weight="600" fill="#2A2422">Recent</text>
+    <text x="16" y="44" font-family="-apple-system" font-size="12" fill="#6B5E57">Walk along the canal</text>
+    <text x="16" y="62" font-family="-apple-system" font-size="12" fill="#6B5E57">Dinner Saturday</text>
+  </g>
+  <g transform="translate(20,340)">
+    <rect width="230" height="90" rx="14" fill="#FFFFFF" stroke="#E9DED4"/>
+    <text x="16" y="22" font-family="-apple-system" font-size="12" font-weight="600" fill="#2A2422">Threads</text>
+    <text x="16" y="44" font-family="-apple-system" font-size="12" fill="#6B5E57">Quiet this week</text>
+    <text x="16" y="62" font-family="-apple-system" font-size="12" fill="#6B5E57">Moving in together</text>
+    <text x="16" y="80" font-family="-apple-system" font-size="12" fill="#6B5E57">Her mum's surgery</text>
+  </g>
+</svg>

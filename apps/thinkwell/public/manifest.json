@@ -1,14 +1,15 @@
 {
   "name": "ThinkWell",
   "slug": "thinkwell",
-  "tagline": "AI-powered personal journaling — iOS and web.",
-  "description": "ThinkWell turns unstructured journal entries into a private, searchable thinking partner. Voice or text in, themes and through-lines out. Built on a tiered Bedrock backend (Haiku → Sonnet escalation) with biometric-locked local storage and a privacy-first sync model.",
+  "tagline": "A quieter place to think — AI-assisted personal journaling.",
+  "description": "ThinkWell is a private, AI-assisted journal that turns your thoughts into a personal map of the people, places, and moments that matter. No ads. No tracking. Your entries never train a model. iOS + web.",
   "status": "active",
-  "version": "0.4.0",
   "updated": "2026-05-19",
+  "tags": ["ios", "react-native", "ai", "aws", "bedrock"],
   "links": {
-    "site": "https://thinkwell.app"
+    "site": "https://thinkwelljournal.com",
+    "demo": "https://app.thinkwelljournal.com"
   },
-  "tags": ["ai", "ios", "react-native", "aws", "bedrock"],
-  "accent": "#8b9dff"
+  "accent": "#E8A384",
+  "applet": "/sites/thinkwell/applet/"
 }

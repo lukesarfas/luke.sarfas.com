@@ -1,82 +1,375 @@
 ---
-import "@sarfas/ui/fonts.css";
-import "@sarfas/ui/tokens.css";
-import MetaTags from "@sarfas/ui/MetaTags.astro";
-import Container from "@sarfas/ui/Container.astro";
-import Button from "@sarfas/ui/Button.astro";
+import Base from "~/layouts/Base.astro";
+import Header from "~/components/Header.astro";
+import Footer from "~/components/Footer.astro";
 
-const SITE_URL = "https://thinkwell.app";
-const title = "ThinkWell — your private thinking partner.";
+const title = "ThinkWell — A quieter place to journal";
 const description =
-  "AI-powered personal journaling for iOS and web. Voice or text in, themes and through-lines out. Private by default.";
-const url = new URL(Astro.url.pathname, SITE_URL).toString();
+  "ThinkWell is a private, AI-assisted journal that turns your thoughts into a personal map of the people, places, and moments that matter.";
+
+const jsonLdWebsite = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "ThinkWell",
+  url: "https://thinkwelljournal.com",
+};
+
+const jsonLdFaq = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: [
+    {
+      "@type": "Question",
+      name: "Is ThinkWell free?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "ThinkWell is free to try — you can start writing straight away with no payment required. A paid subscription unlocks full access to all features including unlimited AI insights and Life Map.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "Is my journal private?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "Yes. Entries are encrypted on-device before they sync. Your data is never sold, never shared with advertisers, and never used to train an AI model.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What platforms does ThinkWell support?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "ThinkWell is available on iPhone (iOS) and in the browser as a web app. iPad and Android support are coming soon.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What is the Life Map?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: "The Life Map is ThinkWell's visual knowledge graph of the people, places, events, and projects that appear in your journal entries. It builds automatically as you write — no tagging required.",
+      },
+    },
+  ],
+};
+
+const jsonLdApp = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      name: "ThinkWell",
+      url: "https://thinkwelljournal.com",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://thinkwelljournal.com/assets/app-icon.png",
+      },
+    },
+    {
+      "@type": "SoftwareApplication",
+      name: "ThinkWell",
+      operatingSystem: "iOS, Web",
+      applicationCategory: "LifestyleApplication",
+      description:
+        "ThinkWell is a private, AI-assisted journal that turns your thoughts into a personal map of the people, places, and moments that matter. No ads. No tracking. Your entries never train a model.",
+      url: "https://thinkwelljournal.com",
+      downloadUrl: "https://apps.apple.com/us/app/thinkwell/id6759228044",
+      screenshot: "https://thinkwelljournal.com/assets/screens/journal.png",
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+        description: "Free to try. Paid subscription unlocks full access.",
+      },
+    },
+  ],
+};
+
+const year = new Date().getFullYear();
 ---
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <meta name="theme-color" content="#08090c" />
-    <MetaTags title={title} description={description} url={url} image="/preview.png" />
-    <style>
-      html, body {
-        margin: 0;
-        padding: 0;
-        background:
-          radial-gradient(1200px 600px at 50% -200px, rgba(139, 157, 255, 0.18), transparent 60%),
-          radial-gradient(900px 500px at 90% 10%, rgba(196, 166, 255, 0.12), transparent 60%),
-          var(--bg);
-        color: var(--fg);
-        font-family: "Inter Variable", "Inter", ui-sans-serif, system-ui, sans-serif;
-        min-height: 100vh;
-      }
-      .hero { padding: 6rem 0 4rem; }
-      h1 {
-        font-size: clamp(2.4rem, 7vw, 4rem);
-        font-weight: 700;
-        letter-spacing: -0.035em;
-        line-height: 1.05;
-        margin: 0 0 1rem;
-      }
-      .accent {
-        background: linear-gradient(135deg, #8b9dff 0%, #c4a6ff 60%, #6dd5d3 100%);
-        -webkit-background-clip: text;
-        background-clip: text;
-        color: transparent;
-      }
-      p.lead {
-        font-size: 1.2rem;
-        line-height: 1.55;
-        color: var(--muted);
-        max-width: 56ch;
-        margin: 0 0 1.75rem;
-      }
-      .actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
-      .muted-row {
-        margin-top: 4rem;
-        padding-top: 2rem;
-        border-top: 1px solid var(--border);
-        color: var(--muted);
-        font-size: 0.9rem;
-      }
-    </style>
-  </head>
-  <body>
-    <Container as="section" class="hero">
-      <h1>Journal a little.<br /><span class="accent">Understand a lot.</span></h1>
-      <p class="lead">
-        ThinkWell turns scattered thoughts into a private, searchable thinking
-        partner. Voice or text in, themes and through-lines out. Private by
-        default; you own the data.
-      </p>
-      <div class="actions">
-        <Button variant="primary" href="mailto:lukesarfas@icloud.com?subject=ThinkWell%20beta">Get on the beta list</Button>
-        <Button href="https://luke.sarfas.com/projects/thinkwell/" external>About the project</Button>
+<Base title={title} description={description} path="/">
+  <Fragment slot="head">
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(jsonLdWebsite)}
+    />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(jsonLdFaq)}
+    />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(jsonLdApp)}
+    />
+  </Fragment>
+
+  <Header />
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <span class="eyebrow">
+            Private by default · Web &amp; iOS · Android coming soon
+          </span>
+          <h1 class="hero-title">A quieter place to think.</h1>
+          <p class="hero-sub">
+            ThinkWell is a journal that listens. Write freely — it quietly
+            weaves your entries into a map of the people, places, and moments
+            that shape your life.
+          </p>
+          <div class="hero-cta">
+            <a
+              class="btn btn-primary"
+              href="https://apps.apple.com/us/app/thinkwell/id6759228044"
+            >
+              Download on iOS
+            </a>
+            <a class="btn btn-ghost" href="https://app.thinkwelljournal.com">
+              Open web app
+            </a>
+          </div>
+          <p class="hero-note">
+            No ads. No tracking. Your entries never train a model.
+          </p>
+        </div>
+
+        <div class="device-stage" aria-hidden="true">
+          <div class="device rear">
+            <div class="device-screen">
+              <img
+                src="/assets/screens/lifemap.png"
+                alt=""
+                onerror="this.src='/assets/screens/placeholder-lifemap.svg'"
+              />
+            </div>
+          </div>
+          <div class="device rear-right">
+            <div class="device-screen">
+              <img
+                src="/assets/screens/insights.png"
+                alt=""
+                onerror="this.src='/assets/screens/placeholder-insights.svg'"
+              />
+            </div>
+          </div>
+          <div class="device">
+            <div class="device-screen">
+              <img
+                src="/assets/screens/journal.png"
+                alt=""
+                onerror="this.src='/assets/screens/placeholder-journal.svg'"
+              />
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="muted-row">
-        Built by <a href="https://luke.sarfas.com" style="color:var(--muted)">Luke Sarfas</a> · Status: active development
+    </section>
+
+    <section id="features">
+      <div class="container">
+        <h2 class="section-title reveal">Write freely. Understand gently.</h2>
+        <p class="section-lead reveal">
+          ThinkWell stays out of the way while you write, then quietly
+          organises what you wrote so the shape of your life becomes easier
+          to see.
+        </p>
+
+        <div class="features">
+          <div class="feature reveal">
+            <div class="feature-icon">✎</div>
+            <h3>A blank page that feels like one</h3>
+            <p>
+              No templates, no prompts you didn't ask for. Just a page, a
+              cursor, and the thought you came to write down.
+            </p>
+          </div>
+          <div class="feature reveal">
+            <div class="feature-icon">◈</div>
+            <h3>Your Life Map</h3>
+            <p>
+              People, places, projects — the entities in your entries become
+              a map of the things you care about, surfaced only when it's
+              useful.
+            </p>
+          </div>
+          <div class="feature reveal">
+            <div class="feature-icon">⋯</div>
+            <h3>Quiet insights</h3>
+            <p>
+              Patterns across your weeks: what's lifting your mood, what
+              keeps coming back, who you've drifted from. Never nagging.
+            </p>
+          </div>
+          <div class="feature reveal">
+            <div class="feature-icon">◐</div>
+            <h3>Reflect sessions</h3>
+            <p>
+              A short, guided walk back through your week — the app asks
+              what would actually help you notice, not tick boxes.
+            </p>
+          </div>
+          <div class="feature reveal">
+            <div class="feature-icon">⌂</div>
+            <h3>Private by design</h3>
+            <p>
+              Entries are encrypted on-device before sync. Nothing is sold,
+              nothing trains a model. Sign out any time and the device
+              forgets.
+            </p>
+          </div>
+          <div class="feature reveal">
+            <div class="feature-icon">◉</div>
+            <h3>Everywhere you are</h3>
+            <p>
+              On the web and iPhone today, with iPad and Android coming
+              soon. The same thought, the same place, wherever you pick it
+              up.
+            </p>
+          </div>
+        </div>
       </div>
-    </Container>
-  </body>
-</html>
+    </section>
+
+    <section class="gallery">
+      <div class="container">
+        <h2 class="section-title reveal">A look around.</h2>
+        <p class="section-lead reveal">
+          Scroll to peek at the pieces you'll actually use day-to-day.
+        </p>
+
+        <div class="gallery-track">
+          <div class="gallery-card reveal">
+            <div class="gallery-phone">
+              <div class="gallery-phone-screen">
+                <img
+                  src="/assets/screens/journal.png"
+                  alt="Writing a journal entry"
+                  onerror="this.src='/assets/screens/placeholder-journal.svg'"
+                />
+              </div>
+            </div>
+            <div class="gallery-caption">The page</div>
+          </div>
+          <div class="gallery-card reveal">
+            <div class="gallery-phone">
+              <div class="gallery-phone-screen">
+                <img
+                  src="/assets/screens/timeline.png"
+                  alt="Timeline of past entries"
+                  onerror="this.src='/assets/screens/placeholder-timeline.svg'"
+                />
+              </div>
+            </div>
+            <div class="gallery-caption">Timeline</div>
+          </div>
+          <div class="gallery-card reveal">
+            <div class="gallery-phone">
+              <div class="gallery-phone-screen">
+                <img
+                  src="/assets/screens/lifemap.png"
+                  alt="Life Map of people and places"
+                  onerror="this.src='/assets/screens/placeholder-lifemap.svg'"
+                />
+              </div>
+            </div>
+            <div class="gallery-caption">Life Map</div>
+          </div>
+          <div class="gallery-card reveal">
+            <div class="gallery-phone">
+              <div class="gallery-phone-screen">
+                <img
+                  src="/assets/screens/insights.png"
+                  alt="Weekly insights"
+                  onerror="this.src='/assets/screens/placeholder-insights.svg'"
+                />
+              </div>
+            </div>
+            <div class="gallery-caption">Insights</div>
+          </div>
+          <div class="gallery-card reveal">
+            <div class="gallery-phone">
+              <div class="gallery-phone-screen">
+                <img
+                  src="/assets/screens/settings.png"
+                  alt="Settings"
+                  onerror="this.src='/assets/screens/placeholder-reflect.svg'"
+                />
+              </div>
+            </div>
+            <div class="gallery-caption">Your account</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq">
+      <div class="container">
+        <h2 class="section-title reveal">Common questions.</h2>
+        <div class="faq-list">
+          <details class="faq-item reveal">
+            <summary>Is ThinkWell free?</summary>
+            <p>
+              ThinkWell is free to try — you can start writing straight away
+              with no payment required. A paid subscription unlocks full
+              access to all features including unlimited AI insights and Life
+              Map.
+            </p>
+          </details>
+          <details class="faq-item reveal">
+            <summary>Is my journal private?</summary>
+            <p>
+              Yes. Entries are encrypted on-device before they sync. Your
+              data is never sold, never shared with advertisers, and never
+              used to train an AI model. You can sign out any time and the
+              device forgets everything.
+            </p>
+          </details>
+          <details class="faq-item reveal">
+            <summary>What platforms does ThinkWell support?</summary>
+            <p>
+              ThinkWell is available on iPhone (iOS) and in the browser as
+              a web app. iPad and Android support are coming soon. Your
+              journal stays in sync across every device you use.
+            </p>
+          </details>
+          <details class="faq-item reveal">
+            <summary>What is the Life Map?</summary>
+            <p>
+              The Life Map is ThinkWell's visual knowledge graph of the
+              people, places, events, and projects that appear in your
+              journal entries. It builds automatically as you write — no
+              tagging required — so you can see the shape of your life at a
+              glance.
+            </p>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="container">
+        <div class="cta-banner reveal">
+          <h2>Start writing today.</h2>
+          <p>Free to try. Your first entry takes thirty seconds.</p>
+          <div class="hero-cta" style="justify-content:center;">
+            <a
+              class="btn btn-primary"
+              href="https://apps.apple.com/us/app/thinkwell/id6759228044"
+            >
+              Download on iOS
+            </a>
+            <a class="btn btn-ghost" href="https://app.thinkwelljournal.com">
+              Open web app
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <Footer />
+
+  <div style="display:none" data-year={year}></div>
+</Base>

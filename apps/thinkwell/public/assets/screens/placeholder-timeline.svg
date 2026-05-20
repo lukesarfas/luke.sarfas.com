@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 270 570">
+  <rect width="270" height="570" fill="#FBF5EE"/>
+  <text x="20" y="60" font-family="ui-serif, Georgia, serif" font-size="22" fill="#2A2422">Timeline</text>
+  <g font-family="-apple-system" font-size="12" fill="#2A2422">
+    <g transform="translate(20,100)">
+      <rect width="230" height="70" rx="14" fill="#FFFFFF" stroke="#E9DED4"/>
+      <text x="16" y="22" font-weight="600">Today · Sunday</text>
+      <text x="16" y="42" fill="#6B5E57">Walk along the canal with Mia.</text>
+      <text x="16" y="58" fill="#6B5E57">Coffee at Prufrock.</text>
+    </g>
+    <g transform="translate(20,185)">
+      <rect width="230" height="70" rx="14" fill="#FFFFFF" stroke="#E9DED4"/>
+      <text x="16" y="22" font-weight="600">Saturday</text>
+      <text x="16" y="42" fill="#6B5E57">Finished the book. Slow and</text>
+      <text x="16" y="58" fill="#6B5E57">quiet, which I needed.</text>
+    </g>
+    <g transform="translate(20,270)">
+      <rect width="230" height="70" rx="14" fill="#FFFFFF" stroke="#E9DED4"/>
+      <text x="16" y="22" font-weight="600">Friday</text>
+      <text x="16" y="42" fill="#6B5E57">Long day at work — the demo</text>
+      <text x="16" y="58" fill="#6B5E57">went better than expected.</text>
+    </g>
+    <g transform="translate(20,355)">
+      <rect width="230" height="70" rx="14" fill="#FFFFFF" stroke="#E9DED4"/>
+      <text x="16" y="22" font-weight="600">Thursday</text>
+      <text x="16" y="42" fill="#6B5E57">Dad called. Sounded tired.</text>
+    </g>
+  </g>
+</svg>
