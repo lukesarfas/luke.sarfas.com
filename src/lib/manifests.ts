@@ -22,8 +22,8 @@ export interface ProjectManifest {
 
 interface RegistryEntry {
   slug: string;
-  manifestUrl: string;
-  fallback?: Partial<ProjectManifest>;
+  manifestUrl?: string;
+  manifest?: Partial<ProjectManifest>;
 }
 
 const TIMEOUT_MS = 5000;
@@ -39,18 +39,21 @@ async function fetchWithTimeout(url: string): Promise<Response> {
 }
 
 async function loadOne(entry: RegistryEntry): Promise<ProjectManifest | null> {
-  try {
-    const res = await fetchWithTimeout(entry.manifestUrl);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const data = (await res.json()) as ProjectManifest;
-    return { ...entry.fallback, ...data, slug: entry.slug };
-  } catch (err) {
-    console.warn(`[manifests] ${entry.slug} failed: ${(err as Error).message}`);
-    if (entry.fallback?.name) {
-      return { name: entry.fallback.name, slug: entry.slug, ...entry.fallback };
+  const inline = entry.manifest ?? {};
+
+  if (entry.manifestUrl) {
+    try {
+      const res = await fetchWithTimeout(entry.manifestUrl);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const remote = (await res.json()) as Partial<ProjectManifest>;
+      return { ...inline, ...remote, slug: entry.slug } as ProjectManifest;
+    } catch (err) {
+      console.warn(`[manifests] ${entry.slug} fetch failed: ${(err as Error).message}`);
     }
-    return null;
   }
+
+  if (!inline.name) return null;
+  return { ...inline, slug: entry.slug } as ProjectManifest;
 }
 
 export async function loadAll(): Promise<ProjectManifest[]> {
