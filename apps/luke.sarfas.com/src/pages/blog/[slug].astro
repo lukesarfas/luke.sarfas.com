@@ -3,22 +3,40 @@ import Base from "~/layouts/Base.astro";
 import { getCollection, type CollectionEntry } from "astro:content";
 
 export async function getStaticPaths() {
-  const posts = await getCollection("blog", ({ data }) => !data.draft);
-  return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+  const posts = (await getCollection("blog", ({ data }) => !data.draft)).sort(
+    (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+  );
+  return posts.map((post, i) => ({
+    params: { slug: post.slug },
+    props: {
+      post,
+      newer: posts[i - 1] ?? null,
+      older: posts[i + 1] ?? null,
+    },
+  }));
 }
 
 interface Props {
   post: CollectionEntry<"blog">;
+  newer: CollectionEntry<"blog"> | null;
+  older: CollectionEntry<"blog"> | null;
 }
 
-const { post } = Astro.props;
+const { post, newer, older } = Astro.props;
 const { Content } = await post.render();
 
 const fmt = (d: Date) =>
   d.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
+
+const words = post.body.trim().split(/\s+/).length;
+const readingMinutes = Math.max(1, Math.round(words / 220));
 ---
 
-<Base title={`${post.data.title} · Luke Sarfas`} description={post.data.description}>
+<Base
+  title={`${post.data.title} · Luke Sarfas`}
+  description={post.data.description}
+  type="article"
+>
   <article class="post">
     <a href="/blog/" class="backlink">← Blog</a>
     <header class="detail-head" style="margin-top:1rem">
@@ -29,6 +47,7 @@ const fmt = (d: Date) =>
         {post.data.updated && (
           <span>· updated {fmt(post.data.updated)}</span>
         )}
+        <span>· {readingMinutes} min read</span>
         {post.data.tags.length > 0 && (
           <span class="tags">
             {post.data.tags.map((t) => <span class="tag">{t}</span>)}
@@ -40,6 +59,23 @@ const fmt = (d: Date) =>
     <div class="detail-body post-body">
       <Content />
     </div>
+
+    {(newer || older) && (
+      <nav class="post-nav" aria-label="Other posts">
+        {older && (
+          <a href={`/blog/${older.slug}/`} class="post-nav-link post-nav-prev">
+            <span class="muted">← Older</span>
+            <strong>{older.data.title}</strong>
+          </a>
+        )}
+        {newer && (
+          <a href={`/blog/${newer.slug}/`} class="post-nav-link post-nav-next">
+            <span class="muted">Newer →</span>
+            <strong>{newer.data.title}</strong>
+          </a>
+        )}
+      </nav>
+    )}
   </article>
 </Base>
 
@@ -74,5 +110,52 @@ const fmt = (d: Date) =>
     border-left: 3px solid var(--border-strong);
     padding-left: 1rem;
     color: var(--muted);
+  }
+  .post-nav {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+  .post-nav-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--card);
+    color: var(--fg);
+    font-size: 0.95rem;
+    transition: border-color 200ms var(--ease), background 200ms var(--ease),
+      transform 200ms var(--ease);
+  }
+  .post-nav-link:hover {
+    border-color: var(--border-strong);
+    background: var(--card-hover);
+    color: var(--fg);
+    transform: translateY(-1px);
+  }
+  .post-nav-link .muted {
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+  }
+  .post-nav-next {
+    text-align: right;
+    grid-column: 2;
+  }
+  .post-nav-prev:only-child {
+    grid-column: 1 / -1;
+  }
+  @media (max-width: 600px) {
+    .post-nav {
+      grid-template-columns: 1fr;
+    }
+    .post-nav-next {
+      grid-column: 1;
+      text-align: left;
+    }
   }
 </style>

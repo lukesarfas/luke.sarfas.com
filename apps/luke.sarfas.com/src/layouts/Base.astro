@@ -8,13 +8,15 @@ interface Props {
   title: string;
   description?: string;
   image?: string;
+  type?: "website" | "article";
 }
 
 const SITE_URL = "https://luke.sarfas.com";
 const {
   title,
-  description = "Luke Sarfas — projects, writing, and what I'm building.",
+  description = "Luke Sarfas. Projects, writing, and what I'm building.",
   image,
+  type = "website",
 } = Astro.props;
 const url = new URL(Astro.url.pathname, SITE_URL).toString();
 ---
@@ -26,7 +28,19 @@ const url = new URL(Astro.url.pathname, SITE_URL).toString();
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="theme-color" content="#08090c" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <MetaTags title={title} description={description} url={url} image={image} />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="Luke Sarfas"
+      href="/rss.xml"
+    />
+    <MetaTags
+      title={title}
+      description={description}
+      url={url}
+      image={image}
+      type={type}
+    />
   </head>
   <body>
     <Header />
