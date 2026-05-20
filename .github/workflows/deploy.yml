@@ -27,8 +27,8 @@ jobs:
 
       - run: npm ci
 
-      - name: Build
-        run: npm run build
+      - name: Build hub
+        run: npm run build:hub
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0

@@ -1,17 +1,20 @@
 {
-  "name": "luke.sarfas.com",
-  "type": "module",
-  "version": "0.1.0",
+  "name": "sarfas-sites",
   "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "astro dev",
-    "start": "astro dev",
-    "build": "astro build",
-    "preview": "astro preview",
-    "astro": "astro"
+    "dev": "npm --workspace luke.sarfas.com run dev",
+    "dev:hub": "npm --workspace luke.sarfas.com run dev",
+    "dev:lickme": "npm --workspace lickme-site run dev",
+    "build": "npm --workspace luke.sarfas.com run build && npm --workspace lickme-site run build",
+    "build:hub": "npm --workspace luke.sarfas.com run build",
+    "build:lickme": "npm --workspace lickme-site run build"
   },
-  "dependencies": {
-    "@fontsource-variable/inter": "^5.2.8",
-    "astro": "^4.16.0"
+  "engines": {
+    "node": ">=20"
   }
 }
