@@ -1,5 +1,6 @@
 ---
 import Base from "~/layouts/Base.astro";
+import Preview from "~/components/Preview.astro";
 import { loadAll } from "~/lib/manifests";
 
 export async function getStaticPaths() {
@@ -8,32 +9,43 @@ export async function getStaticPaths() {
 }
 
 const { project } = Astro.props;
+const statusClass = project.status ? `status-${project.status}` : "";
 ---
 
 <Base title={`${project.name} — Luke Sarfas`} description={project.tagline}>
-  <p><a href="/projects">← Projects</a></p>
-  <h1>{project.name}</h1>
-  {project.tagline && <p class="muted">{project.tagline}</p>}
+  <a href="/projects" class="backlink" style="margin-top:1.5rem;display:inline-flex">← All projects</a>
 
-  <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:0.75rem;font-size:0.9rem">
-    {project.status && <span class={`status-${project.status}`}>● {project.status}</span>}
-    {project.version && <span class="muted">v{project.version}</span>}
-    {project.updated && <span class="muted">updated {project.updated}</span>}
+  <header class="detail-head" style="margin-top:1.5rem">
+    <h1>{project.name}</h1>
+    {project.tagline && <p class="lead muted" style="max-width:60ch">{project.tagline}</p>}
+    <div class="detail-meta">
+      {project.status && <span class={`status ${statusClass}`}>{project.status}</span>}
+      {project.version && <span>v{project.version}</span>}
+      {project.updated && <span>updated {project.updated}</span>}
+    </div>
+  </header>
+
+  <div class="detail-preview">
+    <Preview project={project} />
   </div>
 
-  {project.description && <p style="margin-top:1.25rem">{project.description}</p>}
+  {project.description && (
+    <div class="detail-body">
+      <p>{project.description}</p>
+    </div>
+  )}
 
   {project.links && (
-    <div style="margin-top:1rem;display:flex;gap:1rem;flex-wrap:wrap">
-      {project.links.site && <a href={project.links.site}>Site ↗</a>}
-      {project.links.demo && <a href={project.links.demo}>Demo ↗</a>}
-      {project.links.repo && <a href={project.links.repo}>Repo ↗</a>}
-      {project.links.docs && <a href={project.links.docs}>Docs ↗</a>}
+    <div class="detail-actions">
+      {project.links.site && <a class="btn btn-primary" href={project.links.site}>Visit site ↗</a>}
+      {project.links.demo && <a class="btn" href={project.links.demo}>Live demo ↗</a>}
+      {project.links.repo && <a class="btn" href={project.links.repo}>Source ↗</a>}
+      {project.links.docs && <a class="btn" href={project.links.docs}>Docs ↗</a>}
     </div>
   )}
 
   {project.tags && project.tags.length > 0 && (
-    <div style="margin-top:1.25rem">
+    <div style="margin-top:1.75rem">
       {project.tags.map((t) => <span class="tag">{t}</span>)}
     </div>
   )}

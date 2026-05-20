@@ -8,14 +8,22 @@ projects.sort((a, b) => (b.updated ?? "").localeCompare(a.updated ?? ""));
 ---
 
 <Base title="Projects — Luke Sarfas">
-  <h1>Projects</h1>
-  <p class="muted">Pulled live from each project's manifest at build time.</p>
+  <section class="hero" style="padding-top:3rem;padding-bottom:0">
+    <span class="eyebrow">Index</span>
+    <h1>Projects</h1>
+    <p class="lead">
+      Everything I'm building or have built. Each card pulls live data from the
+      project at build time, so what's here is what's true today.
+    </p>
+  </section>
 
-  {projects.length === 0 ? (
-    <p class="muted" style="margin-top:1.5rem">Nothing here yet.</p>
-  ) : (
-    <div class="grid">
-      {projects.map((p) => <ProjectCard project={p} />)}
-    </div>
-  )}
+  <section class="section" style="margin-top:2.5rem">
+    {projects.length === 0 ? (
+      <p class="muted">Nothing here yet.</p>
+    ) : (
+      <div class="grid">
+        {projects.map((p) => <ProjectCard project={p} />)}
+      </div>
+    )}
+  </section>
 </Base>

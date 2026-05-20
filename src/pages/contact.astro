@@ -3,13 +3,20 @@ import Base from "~/layouts/Base.astro";
 ---
 
 <Base title="Contact — Luke Sarfas">
-  <h1>Contact</h1>
-  <p class="muted">The best ways to reach me.</p>
+  <section class="hero" style="padding-top:3rem;padding-bottom:0">
+    <span class="eyebrow">Hello</span>
+    <h1>Get in touch</h1>
+    <p class="lead">
+      The fastest way to reach me is email. I read everything; I reply to most things.
+    </p>
+  </section>
 
-  <ul style="list-style:none;padding:0;margin-top:1.5rem;display:flex;flex-direction:column;gap:0.6rem">
-    <li>
-      <strong>Email</strong> ·
-      <a href="mailto:lukesarfas@icloud.com">lukesarfas@icloud.com</a>
-    </li>
-  </ul>
+  <section class="section" style="margin-top:2rem">
+    <ul class="contact-list">
+      <li>
+        <span class="label">Email</span>
+        <a href="mailto:lukesarfas@icloud.com">lukesarfas@icloud.com</a>
+      </li>
+    </ul>
+  </section>
 </Base>

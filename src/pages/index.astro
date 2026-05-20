@@ -4,26 +4,38 @@ import ProjectCard from "~/components/ProjectCard.astro";
 import { loadAll } from "~/lib/manifests";
 
 const projects = await loadAll();
+projects.sort((a, b) => (b.updated ?? "").localeCompare(a.updated ?? ""));
 const featured = projects.slice(0, 6);
 ---
 
 <Base title="Luke Sarfas">
-  <h1>Hey, I'm Luke.</h1>
-  <p class="muted">
-    I build things and write about them. Here's what I'm working on right now.
-  </p>
-
-  {featured.length === 0 ? (
-    <p class="muted" style="margin-top:1.5rem">
-      No projects registered yet. Add entries to <code>src/data/projects.json</code>.
+  <section class="hero">
+    <span class="eyebrow fade-in">Independent builder</span>
+    <h1 class="fade-in fade-in-1">
+      I build things,<br />
+      <span class="gradient-text">and write about them.</span>
+    </h1>
+    <p class="lead fade-in fade-in-2">
+      Personal projects, experiments, and the occasional product. Everything here is
+      mine; nothing is sponsored. Updated automatically as each project ships.
     </p>
-  ) : (
-    <div class="grid">
-      {featured.map((p) => <ProjectCard project={p} />)}
+    <div class="actions fade-in fade-in-3">
+      <a class="btn btn-primary" href="/projects">See projects →</a>
+      <a class="btn" href="/contact">Get in touch</a>
     </div>
-  )}
+  </section>
 
-  <p style="margin-top:2rem">
-    <a href="/projects">See all projects →</a>
-  </p>
+  <section class="section">
+    <div class="section-head">
+      <h2>Currently building</h2>
+      {projects.length > 6 && <a href="/projects" class="muted">All projects →</a>}
+    </div>
+    {featured.length === 0 ? (
+      <p class="muted">No projects registered yet. Add entries to <code>src/data/projects.json</code>.</p>
+    ) : (
+      <div class="grid">
+        {featured.map((p) => <ProjectCard project={p} />)}
+      </div>
+    )}
+  </section>
 </Base>

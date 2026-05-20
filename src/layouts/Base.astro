@@ -8,7 +8,7 @@ interface Props {
   description?: string;
 }
 
-const { title, description = "Luke Sarfas — projects and writing." } = Astro.props;
+const { title, description = "Luke Sarfas — projects, writing, and what I'm building." } = Astro.props;
 ---
 
 <!doctype html>
@@ -16,6 +16,7 @@ const { title, description = "Luke Sarfas — projects and writing." } = Astro.p
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#08090c" />
     <meta name="description" content={description} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
@@ -24,12 +25,10 @@ const { title, description = "Luke Sarfas — projects and writing." } = Astro.p
     <title>{title}</title>
   </head>
   <body>
-    <div class="wrap">
-      <Header />
-      <main>
-        <slot />
-      </main>
-      <Footer />
-    </div>
+    <Header />
+    <main class="wrap">
+      <slot />
+    </main>
+    <Footer />
   </body>
 </html>

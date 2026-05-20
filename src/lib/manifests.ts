@@ -16,6 +16,8 @@ export interface ProjectManifest {
     demo?: string;
     docs?: string;
   };
+  preview?: string;
+  accent?: string;
   screenshot?: string;
   tags?: string[];
 }

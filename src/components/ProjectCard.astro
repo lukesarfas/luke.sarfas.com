@@ -1,5 +1,6 @@
 ---
 import type { ProjectManifest } from "~/lib/manifests";
+import Preview from "~/components/Preview.astro";
 
 interface Props {
   project: ProjectManifest;
@@ -9,15 +10,20 @@ const { project } = Astro.props;
 const statusClass = project.status ? `status-${project.status}` : "";
 ---
 
-<a class="card" href={`/projects/${project.slug}/`}>
-  <div style="display:flex;justify-content:space-between;align-items:baseline;gap:0.5rem;">
-    <strong style="font-size:1.05rem;color:var(--fg)">{project.name}</strong>
-    {project.status && <span class={statusClass} style="font-size:0.78rem">{project.status}</span>}
+<a class="pcard" href={`/projects/${project.slug}/`}>
+  <div class="preview">
+    <Preview project={project} />
   </div>
-  {project.tagline && <span class="muted">{project.tagline}</span>}
-  {project.tags && project.tags.length > 0 && (
-    <div style="margin-top:0.4rem">
-      {project.tags.slice(0, 4).map((t) => <span class="tag">{t}</span>)}
+  <div class="body">
+    <div class="head">
+      <strong>{project.name}</strong>
+      {project.status && <span class={`status ${statusClass}`}>{project.status}</span>}
     </div>
-  )}
+    {project.tagline && <p class="tagline">{project.tagline}</p>}
+    {project.tags && project.tags.length > 0 && (
+      <div class="tags">
+        {project.tags.slice(0, 4).map((t) => <span class="tag">{t}</span>)}
+      </div>
+    )}
+  </div>
 </a>

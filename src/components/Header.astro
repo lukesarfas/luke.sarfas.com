@@ -1,16 +1,23 @@
 ---
 const path = Astro.url.pathname;
-function active(p: string) {
-  if (p === "/") return path === "/";
-  return path.startsWith(p);
+function active(prefix: string) {
+  if (prefix === "/") return path === "/";
+  return path === prefix || path.startsWith(prefix + "/");
 }
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/projects", label: "Projects" },
+  { href: "/contact", label: "Contact" },
+];
 ---
 
 <nav class="top">
-  <a href="/" style="font-weight:600">luke.sarfas.com</a>
-  <div>
-    <a href="/" style={active("/") && !active("/projects") && !active("/contact") ? "color:var(--accent)" : ""}>Home</a>
-    <a href="/projects" style={active("/projects") ? "color:var(--accent)" : ""}>Projects</a>
-    <a href="/contact" style={active("/contact") ? "color:var(--accent)" : ""}>Contact</a>
+  <div class="nav-inner">
+    <a href="/" class="brand">luke<span style="color:var(--accent)">.</span>sarfas<span style="color:var(--accent)">.</span>com</a>
+    <div class="links">
+      {links.map((l) => (
+        <a href={l.href} class={active(l.href) ? "active" : ""}>{l.label}</a>
+      ))}
+    </div>
   </div>
 </nav>
