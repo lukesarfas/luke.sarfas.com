@@ -1,0 +1,96 @@
+---
+import Base from "~/layouts/Base.astro";
+import Container from "@sarfas/ui/Container.astro";
+import Header from "~/components/Header.astro";
+import Footer from "~/components/Footer.astro";
+
+const title = "About — LickMe";
+const description =
+  "Why LickMe exists, and the small principles behind it.";
+---
+
+<Base title={title} description={description} path="/about">
+  <Header />
+
+  <main>
+    <Container as="article" class="prose">
+      <h1>About</h1>
+
+      <p>
+        Every improvising musician carries a private library of licks — short
+        phrases stolen from records, lessons, and other players. Most of that
+        library lives in the back of a notebook, or scribbled on the side of a
+        chart, or just in muscle memory. It's hard to share, and harder to
+        learn from someone else's.
+      </p>
+
+      <p>
+        LickMe is one place to put them. Write a lick down. Tag it. Drop it in
+        a key. Then watch what happens when other players take it into the
+        wild — onto a bandstand, into a take, into a context you didn't
+        imagine — and post a short video back to the page.
+      </p>
+
+      <p>
+        The site is built around a few small principles:
+      </p>
+
+      <ul>
+        <li>
+          <strong>Notation in the browser.</strong> ABC or plain text in;
+          rendered notation out. Nothing to install.
+        </li>
+        <li>
+          <strong>Video is the proof.</strong> A lick is just a sketch until
+          someone plays it inside a real song. The videos are the lesson.
+        </li>
+        <li>
+          <strong>Quiet by default.</strong> No counters in your face, no
+          notifications, no algorithmic feed competing for your attention.
+        </li>
+      </ul>
+
+      <p>
+        LickMe is built by <a href="https://luke.sarfas.com">Luke Sarfas</a>.
+        It is in active development; you can <a
+          href="mailto:lukesarfas@icloud.com?subject=LickMe%20waitlist"
+        >ask to be notified</a
+        > when it opens up.
+      </p>
+    </Container>
+  </main>
+
+  <Footer />
+</Base>
+
+<style>
+  main {
+    padding: 2.5rem 0 4rem;
+  }
+  .prose {
+    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    color: var(--fg);
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+  .prose h1 {
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+    margin-bottom: 0.5rem;
+  }
+  .prose ul {
+    padding-left: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .prose a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .prose a:hover {
+    color: var(--accent-2);
+  }
+</style>

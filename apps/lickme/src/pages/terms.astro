@@ -1,0 +1,67 @@
+---
+import Base from "~/layouts/Base.astro";
+import Container from "@sarfas/ui/Container.astro";
+import Header from "~/components/Header.astro";
+import Footer from "~/components/Footer.astro";
+
+const title = "Terms — LickMe";
+const description = "Terms of use for LickMe.";
+---
+
+<Base title={title} description={description} path="/terms">
+  <Header />
+
+  <main>
+    <Container as="article" class="prose">
+      <h1>Terms</h1>
+      <p class="muted">Last updated: TBD when the service launches.</p>
+
+      <p>
+        LickMe is not open to the public yet. This page is a placeholder.
+      </p>
+
+      <p>
+        When the service launches, this page will cover the basics: who owns
+        the content you upload (you do), what we'll do if content is reported
+        or breaks the law (remove it; cooperate with rights-holders for valid
+        takedowns), and the usual disclaimer that the service is provided as
+        is.
+      </p>
+
+      <p>
+        Questions: <a href="mailto:lukesarfas@icloud.com">lukesarfas@icloud.com</a>.
+      </p>
+    </Container>
+  </main>
+
+  <Footer />
+</Base>
+
+<style>
+  main {
+    padding: 2.5rem 0 4rem;
+  }
+  .prose {
+    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    color: var(--fg);
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+  .prose h1 {
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+  }
+  .prose .muted {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .prose a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .prose a:hover {
+    color: var(--accent-2);
+  }
+</style>

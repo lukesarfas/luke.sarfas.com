@@ -1,0 +1,29 @@
+---
+import "~/styles/global.css";
+import MetaTags from "@sarfas/ui/MetaTags.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  path?: string;
+}
+const { title, description, path = "/" } = Astro.props;
+const url = new URL(path, Astro.site ?? "https://lickme.app").toString();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#08090c" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <MetaTags title={title} description={description} url={url} />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

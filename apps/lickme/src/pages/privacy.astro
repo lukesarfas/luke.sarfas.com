@@ -1,0 +1,67 @@
+---
+import Base from "~/layouts/Base.astro";
+import Container from "@sarfas/ui/Container.astro";
+import Header from "~/components/Header.astro";
+import Footer from "~/components/Footer.astro";
+
+const title = "Privacy — LickMe";
+const description = "How LickMe handles your data.";
+---
+
+<Base title={title} description={description} path="/privacy">
+  <Header />
+
+  <main>
+    <Container as="article" class="prose">
+      <h1>Privacy</h1>
+      <p class="muted">Last updated: TBD when the service launches.</p>
+
+      <p>
+        LickMe is not open to the public yet. This page is a placeholder.
+      </p>
+
+      <p>
+        When the service launches, this page will cover: what we collect (the
+        minimum to run the site — your email for login, the licks and videos
+        you publish, basic analytics), how it's stored, who it's shared with
+        (nobody, beyond the infrastructure providers we need to run on), and
+        how to delete your account.
+      </p>
+
+      <p>
+        Questions: <a href="mailto:lukesarfas@icloud.com">lukesarfas@icloud.com</a>.
+      </p>
+    </Container>
+  </main>
+
+  <Footer />
+</Base>
+
+<style>
+  main {
+    padding: 2.5rem 0 4rem;
+  }
+  .prose {
+    max-width: 680px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.1rem;
+    color: var(--fg);
+    font-size: 1.05rem;
+    line-height: 1.7;
+  }
+  .prose h1 {
+    font-size: clamp(1.8rem, 4vw, 2.4rem);
+  }
+  .prose .muted {
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  .prose a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .prose a:hover {
+    color: var(--accent-2);
+  }
+</style>
