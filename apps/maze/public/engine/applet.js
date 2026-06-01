@@ -19,7 +19,7 @@ if (canvas) {
   const solver = createSolver({
     canvas,
     size: 41,
-    speed: 7,
+    speed: 80,
     onState(s) {
       const showPath = s.phase === PHASE.SOLVED || s.phase === PHASE.REVEALING;
       setText("s-explored", s.explored);

@@ -21,14 +21,25 @@ if (canvas) {
   const solver = createSolver({
     canvas,
     size: 41,
-    speed: 6,
+    speed: 75,
     onState(s) {
       // Don't reveal the path length until the search actually traces it.
       const showPath = s.phase === PHASE.SOLVED || s.phase === PHASE.REVEALING;
       setText("stat-explored", s.explored);
       setText("stat-frontier", s.frontier);
       setText("stat-path", showPath && s.pathLength ? s.pathLength : "—");
-      setText("stat-status", statusText[s.phase] || "");
+      // A paused/not-yet-started maze reads "Ready"/"Paused" rather than the
+      // phase label, so it's clear a New maze is waiting for the user.
+      const status =
+        s.phase === PHASE.SOLVED || s.phase === PHASE.NO_PATH || s.phase === PHASE.ERROR
+          ? statusText[s.phase]
+          : s.running
+            ? statusText[s.phase]
+            : s.explored > 0
+              ? "Paused"
+              : "Ready";
+      setText("stat-status", status || "");
+      setText("speed-rate", `${s.stepsPerSecond.toLocaleString()} steps/s`);
 
       const toggle = $("toggle");
       if (toggle) {
@@ -64,9 +75,13 @@ if (canvas) {
   // pauses/resumes. (Without this the "Replay" label was a no-op.)
   const isDone = () => solver.isSolved() || solver.getPhase() === PHASE.NO_PATH;
 
+  // New maze generates a fresh maze but waits for the user to press Play;
+  // Replay re-runs the current maze and starts immediately.
+  const newMaze = () => solver.regenerate({ autoplay: false });
+
   on("toggle", "click", () => (isDone() ? replay() : solver.toggle()));
   on("step", "click", () => solver.step());
-  on("new", "click", () => solver.regenerate());
+  on("new", "click", newMaze);
   on("speed", "input", (e) => solver.setSpeed(Number(e.target.value)));
   on("size", "change", (e) => solver.setSize(Number(e.target.value)));
 
@@ -85,7 +100,7 @@ if (canvas) {
         break;
       case "n":
       case "N":
-        solver.regenerate();
+        newMaze();
         break;
       case "r":
       case "R":

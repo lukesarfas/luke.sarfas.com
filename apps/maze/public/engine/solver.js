@@ -99,7 +99,7 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
 
   let colours = readColours(canvas);
   let N = oddify(size);
-  let speedSteps = clampSpeed(speed);
+  let speedPos = clampSpeed(speed);
 
   // Precomputed run (typed arrays sized N*N).
   let grid = null; // Uint8Array, 1 = wall, 0 = open
@@ -130,7 +130,7 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
   let errored = false;
 
   function clampSpeed(n) {
-    return Math.min(30, Math.max(1, Math.floor(n)));
+    return Math.min(100, Math.max(0, Math.floor(n)));
   }
   function heur(idx) {
     const x = idx % N;
@@ -406,16 +406,22 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
     if (revealIdx >= path.length) phase = PHASE.SOLVED;
   }
 
-  function exploreStepsPerFrame() {
-    return Math.max(1, Math.round((order.length / 500) * speedSteps));
+  // Speed model: the slider (0..100) maps exponentially to a target
+  // steps/second — 1/s at the slow end (you can watch each step) up to a
+  // size-aware ceiling that finishes any maze in ~1s. A time accumulator
+  // advances the right number of steps each frame, so the rate is honoured
+  // (and reported to the UI) independent of the display frame rate.
+  let accumulator = 0;
+  let lastTs = 0;
+  function targetSPS() {
+    const lo = 1;
+    const hi = Math.max(400, order ? order.length : 1000);
+    const t = speedPos / 100;
+    return Math.max(1, Math.round(lo * Math.pow(hi / lo, t)));
   }
-  function revealStepsPerFrame() {
-    return Math.max(2, Math.ceil(path.length / 150));
-  }
-
-  function tick() {
-    if (phase === PHASE.EXPLORING) advanceTo(closedShown + exploreStepsPerFrame());
-    else if (phase === PHASE.REVEALING) advanceReveal(revealStepsPerFrame());
+  function revealSPS() {
+    // The path reveal is the payoff — keep it brisk (~2s) even at slow settings.
+    return Math.max(targetSPS(), Math.ceil((path ? path.length : 0) / 2) || 1);
   }
 
   function snapshot() {
@@ -428,15 +434,34 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
       pathLength: path ? path.length : 0,
       total: order ? order.length : 0,
       progress: order && order.length ? closedShown / order.length : 0,
+      stepsPerSecond: targetSPS(),
     };
   }
   function emit() {
     report(snapshot());
   }
 
-  function loop() {
+  function loop(ts) {
     if (!running) return;
-    tick();
+    if (!lastTs) lastTs = ts;
+    let dt = (ts - lastTs) / 1000;
+    lastTs = ts;
+    if (dt > 0.1) dt = 0.1; // cap the catch-up after a stall / tab switch
+    if (phase === PHASE.EXPLORING) {
+      accumulator += dt * targetSPS();
+      const n = Math.floor(accumulator);
+      if (n > 0) {
+        accumulator -= n;
+        advanceTo(closedShown + n);
+      }
+    } else if (phase === PHASE.REVEALING) {
+      accumulator += dt * revealSPS();
+      const n = Math.floor(accumulator);
+      if (n > 0) {
+        accumulator -= n;
+        advanceReveal(n);
+      }
+    }
     safeDraw();
     emit();
     if (phase === PHASE.SOLVED || phase === PHASE.NO_PATH || phase === PHASE.ERROR || errored) {
@@ -471,6 +496,8 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
     if (errored || running) return;
     if (phase === PHASE.SOLVED || phase === PHASE.NO_PATH) return;
     running = true;
+    accumulator = 0;
+    lastTs = 0;
     emit();
     rafId = requestAnimationFrame(loop);
   }
@@ -526,11 +553,12 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
     resetPlayback(autoplay);
   }
   function setSpeed(n) {
-    speedSteps = clampSpeed(n);
+    speedPos = clampSpeed(n);
+    emit(); // refresh the displayed steps/second immediately, even while paused
   }
   function setSize(n) {
     N = oddify(n);
-    regenerate();
+    regenerate({ autoplay: false });
   }
   function refreshTheme() {
     colours = readColours(canvas);

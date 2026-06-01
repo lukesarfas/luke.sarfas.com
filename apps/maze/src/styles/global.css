@@ -247,6 +247,13 @@ a {
   color: var(--muted-2);
 }
 
+.controls .rate {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  min-width: 7ch;
+}
+
 .statbar {
   display: flex;
   flex-wrap: wrap;
