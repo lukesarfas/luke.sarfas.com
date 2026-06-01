@@ -6,6 +6,17 @@ import { createSolver, PHASE } from "./solver.js";
 
 const $ = (id) => document.getElementById(id);
 
+// Pseudocode line highlighting, kept in sync with the solver's active line.
+const lineEls = Array.from(document.querySelectorAll("#code .cl"));
+let activeLineEl = null;
+function highlightLine(line) {
+  const next = line >= 0 ? lineEls.find((el) => Number(el.dataset.line) === line) : null;
+  if (next === activeLineEl) return;
+  if (activeLineEl) activeLineEl.classList.remove("active");
+  if (next) next.classList.add("active");
+  activeLineEl = next || null;
+}
+
 const canvas = $("maze");
 if (canvas) {
   const statusText = {
@@ -40,6 +51,7 @@ if (canvas) {
               : "Ready";
       setText("stat-status", status || "");
       setText("speed-rate", `${s.stepsPerSecond.toLocaleString()} steps/s`);
+      highlightLine(s.line);
 
       const toggle = $("toggle");
       if (toggle) {

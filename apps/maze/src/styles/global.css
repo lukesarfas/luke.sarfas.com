@@ -98,19 +98,9 @@ a {
   padding: 0 1.25rem;
 }
 
-/* ---- hero ---- */
-.hero {
-  display: grid;
-  gap: 2.5rem;
-  padding: clamp(3rem, 8vw, 6rem) 0 3rem;
-  grid-template-columns: 1fr;
-}
-
-@media (min-width: 880px) {
-  .hero {
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-  }
+/* ---- intro ---- */
+.intro {
+  padding: clamp(2.5rem, 7vw, 5rem) 0 1.5rem;
 }
 
 .eyebrow {
@@ -121,7 +111,7 @@ a {
   color: var(--muted);
 }
 
-.hero h1 {
+.intro h1 {
   font-family: var(--font-serif);
   font-weight: 400;
   font-size: clamp(2.4rem, 6vw, 3.6rem);
@@ -130,11 +120,79 @@ a {
   margin: 0.6rem 0 1rem;
 }
 
-.hero p.lede {
+.intro p.lede {
   color: var(--fg-soft);
   font-size: clamp(1.02rem, 1.4vw, 1.18rem);
-  max-width: 46ch;
+  max-width: 60ch;
   margin: 0 0 1.6rem;
+}
+
+/* ---- stage: maze + algorithm side by side ---- */
+.stage {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: 1fr;
+  padding-bottom: 1.5rem;
+}
+
+@media (min-width: 960px) {
+  .stage {
+    grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr);
+    align-items: start;
+  }
+}
+
+.codepanel {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--bg-1);
+  overflow: hidden;
+}
+
+@media (min-width: 960px) {
+  .codepanel {
+    position: sticky;
+    top: 1.25rem;
+  }
+}
+
+.code-head {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.code {
+  margin: 0;
+  padding: 0.6rem 0;
+  font-family: var(--font-mono);
+  font-size: 0.84rem;
+  line-height: 1.75;
+  overflow-x: auto;
+  color: var(--fg-soft);
+}
+
+.code .cl {
+  display: block;
+  padding: 0.05rem 1rem;
+  white-space: pre;
+  border-left: 2px solid transparent;
+  transition: background 120ms var(--ease);
+}
+
+.code .cl.active {
+  background: color-mix(in oklab, var(--signature) 18%, transparent);
+  border-left-color: var(--accent);
+  color: var(--fg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .code .cl {
+    transition: none;
+  }
 }
 
 .actions {

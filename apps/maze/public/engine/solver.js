@@ -24,6 +24,11 @@ export const PHASE = {
 const MIN_SIZE = 11;
 const MAX_SIZE = 501;
 
+// Each expansion is animated as four micro-steps, one per pseudocode line.
+const MICROS_PER_EXPANSION = 4;
+// Pseudocode line indices — must match the data-line attributes in index.astro.
+const LINE = { SETUP: 1, PICK: 3, GOAL: 4, RETURN: 4, CLOSE: 5, NEIGHBOURS: 6 };
+
 function oddify(n) {
   const v = Math.min(MAX_SIZE, Math.max(MIN_SIZE, Math.floor(n)));
   return v % 2 === 0 ? v + 1 : v;
@@ -129,6 +134,14 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
   let running = false;
   let errored = false;
 
+  // Line-by-line walkthrough: each expansion is played as MICROS_PER_EXPANSION
+  // micro-steps, each lighting up one line of the pseudocode in the page and
+  // performing exactly that line's effect on the maze.
+  let goalIdx = 0;
+  let microCursor = 0; // micro-steps played during EXPLORING
+  let currentCell = 0; // the cell currently being processed (for the head marker)
+  let activeLine = LINE.SETUP; // pseudocode line currently "executing"
+
   function clampSpeed(n) {
     return Math.min(100, Math.max(0, Math.floor(n)));
   }
@@ -230,6 +243,7 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
 
     const startIdx = sy * N + sx;
     const endIdx = ey * N + ex;
+    goalIdx = endIdx;
     g[startIdx] = 0;
     state[startIdx] = 1;
     openStep[startIdx] = 0;
@@ -356,8 +370,8 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
 
     const cellPx = px / N;
     // current expansion head, while exploring
-    if (phase === PHASE.EXPLORING && closedShown > 0) {
-      const c = order[closedShown - 1];
+    if (phase === PHASE.EXPLORING && microCursor > 0) {
+      const c = currentCell;
       const x = c % N;
       const y = (c / N) | 0;
       ctx.fillStyle = colours.css.current;
@@ -406,6 +420,47 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
     if (revealIdx >= path.length) phase = PHASE.SOLVED;
   }
 
+  // Paint exactly the expansion's "mark explored" effect.
+  function paintCloseStep(exp) {
+    paintCell(order[exp], colours.explored);
+    closedShown = exp + 1;
+  }
+  // Paint the neighbours this expansion discovered (the new frontier).
+  function paintOpenStep(exp) {
+    while (openPtr < openOrder.length && openStep[openOrder[openPtr]] <= exp) {
+      const c = openOrder[openPtr];
+      if (closedAt[c] === -1 || closedAt[c] > exp) paintCell(c, colours.frontier);
+      openPtr++;
+    }
+  }
+  // Advance the line-by-line walkthrough by `n` micro-steps. Each expansion is
+  // four micros: pick lowest-f → goal test → mark explored → expand neighbours,
+  // each lighting up the matching pseudocode line and doing its effect.
+  function advanceMicros(n) {
+    const totalMicros = order.length * MICROS_PER_EXPANSION;
+    for (let i = 0; i < n && microCursor < totalMicros; i++) {
+      const exp = Math.floor(microCursor / MICROS_PER_EXPANSION);
+      const m = microCursor % MICROS_PER_EXPANSION;
+      if (m === 0) {
+        currentCell = order[exp];
+        activeLine = LINE.PICK;
+      } else if (m === 1) {
+        activeLine = order[exp] === goalIdx ? LINE.RETURN : LINE.GOAL;
+      } else if (m === 2) {
+        paintCloseStep(exp);
+        activeLine = LINE.CLOSE;
+      } else {
+        paintOpenStep(exp);
+        activeLine = LINE.NEIGHBOURS;
+      }
+      microCursor++;
+    }
+    if (microCursor >= totalMicros) {
+      phase = found ? PHASE.REVEALING : PHASE.NO_PATH;
+      if (found) activeLine = LINE.RETURN;
+    }
+  }
+
   // Speed model: the slider (0..100) maps exponentially to a target
   // steps/second — 1/s at the slow end (you can watch each step) up to a
   // size-aware ceiling that finishes any maze in ~1s. A time accumulator
@@ -435,6 +490,7 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
       total: order ? order.length : 0,
       progress: order && order.length ? closedShown / order.length : 0,
       stepsPerSecond: targetSPS(),
+      line: activeLine,
     };
   }
   function emit() {
@@ -448,11 +504,12 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
     lastTs = ts;
     if (dt > 0.1) dt = 0.1; // cap the catch-up after a stall / tab switch
     if (phase === PHASE.EXPLORING) {
-      accumulator += dt * targetSPS();
+      // micros/second = steps/second × lines-per-expansion
+      accumulator += dt * targetSPS() * MICROS_PER_EXPANSION;
       const n = Math.floor(accumulator);
       if (n > 0) {
         accumulator -= n;
-        advanceTo(closedShown + n);
+        advanceMicros(n);
       }
     } else if (phase === PHASE.REVEALING) {
       accumulator += dt * revealSPS();
@@ -485,7 +542,9 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
   function finishInstantly() {
     advanceTo(order.length);
     advanceReveal(path.length);
+    microCursor = order.length * MICROS_PER_EXPANSION;
     phase = found ? PHASE.SOLVED : PHASE.NO_PATH;
+    activeLine = found ? LINE.RETURN : LINE.GOAL;
     running = false;
     safeDraw();
     emit();
@@ -514,7 +573,8 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
   function step() {
     if (errored) return;
     pause();
-    if (phase === PHASE.EXPLORING) advanceTo(closedShown + 1);
+    // Step advances ONE pseudocode line (one micro-step) during the search.
+    if (phase === PHASE.EXPLORING) advanceMicros(1);
     else if (phase === PHASE.REVEALING) advanceReveal(1);
     safeDraw();
     emit();
@@ -524,6 +584,9 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
     closedShown = 0;
     openPtr = 0;
     revealIdx = 0;
+    microCursor = 0;
+    currentCell = order ? order[0] : 0;
+    activeLine = LINE.SETUP;
     phase = PHASE.EXPLORING;
     errored = false;
     paintBase();

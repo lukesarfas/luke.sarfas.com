@@ -9,24 +9,24 @@ const repo = "https://github.com/lukesarfas/A-Star-Maze-Algorithm-Solver";
   description="Watch A* find its way out of a randomly generated maze — recursive-backtracking generation, A* pathfinding with a Manhattan heuristic, rendered live to a canvas."
 >
   <main class="wrap">
-    <section class="hero">
-      <div>
-        <span class="eyebrow">Algorithms · Visualisation</span>
-        <h1>A* Maze Solver</h1>
-        <p class="lede">
-          A maze is carved with recursive backtracking, then A* searches for the
-          exit — biased toward the goal by a Manhattan-distance heuristic. The
-          explored cells, the live frontier, and the shortest path are drawn as
-          it runs.
-        </p>
-        <div class="actions">
-          <a class="btn btn-primary" href={repo} target="_blank" rel="noopener">
-            Source on GitHub <span aria-hidden="true">↗</span>
-          </a>
-          <a class="btn" href="https://luke.sarfas.com">← luke.sarfas.com</a>
-        </div>
+    <section class="intro">
+      <span class="eyebrow">Algorithms · Visualisation</span>
+      <h1>A* Maze Solver</h1>
+      <p class="lede">
+        A maze is carved with recursive backtracking, then A* searches for the
+        exit — biased toward the goal by a Manhattan-distance heuristic. Watch
+        the explored cells, the live frontier, and the shortest path appear as
+        the algorithm runs, line by line.
+      </p>
+      <div class="actions">
+        <a class="btn btn-primary" href={repo} target="_blank" rel="noopener">
+          Source on GitHub <span aria-hidden="true">↗</span>
+        </a>
+        <a class="btn" href="https://luke.sarfas.com">← luke.sarfas.com</a>
       </div>
+    </section>
 
+    <section class="stage">
       <section class="demo" aria-label="Interactive A* maze solver">
         <canvas
           id="maze"
@@ -76,12 +76,23 @@ const repo = "https://github.com/lukesarfas/A-Star-Maze-Algorithm-Solver";
         </ul>
 
         <p class="kbd-hint">
-          Keyboard: <kbd>Space</kbd> play/pause · <kbd>→</kbd> step · <kbd>R</kbd> replay · <kbd>N</kbd> new maze
+          Keyboard: <kbd>Space</kbd> play/pause · <kbd>→</kbd> step a line · <kbd>R</kbd> replay · <kbd>N</kbd> new maze
         </p>
 
         <!-- Screen-reader status; updated on meaningful transitions only. -->
         <div id="a11y-status" class="visually-hidden" role="status" aria-live="polite"></div>
       </section>
+
+      <aside class="codepanel" aria-label="A* algorithm, highlighted as it runs">
+        <div class="code-head">A* · the line running now is highlighted</div>
+        <pre class="code" tabindex="0" aria-label="A* algorithm pseudocode"><code id="code"><span class="cl" data-line="0">function aStar(start, goal):</span>
+<span class="cl" data-line="1">  add start to open    · ordered by f = g + h</span>
+<span class="cl" data-line="2">  while open is not empty:</span>
+<span class="cl" data-line="3">    current ← lowest-f node in open</span>
+<span class="cl" data-line="4">    if current = goal → return path</span>
+<span class="cl" data-line="5">    mark current explored</span>
+<span class="cl" data-line="6">    relax neighbours → add to frontier</span></code></pre>
+      </aside>
     </section>
 
     <section class="section">
