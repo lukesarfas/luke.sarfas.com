@@ -1,4 +1,7 @@
-@import "@sarfas/ui/fonts.css";
+/* Tokens only (no @fontsource import): the showcase is mounted at /sites/maze/
+   on the hub, where absolutely-pathed /_astro/*.woff2 font URLs would 404. We
+   use the system font stack (already the --font-sans fallback) so the page has
+   no external asset references and renders correctly at any mount path. */
 @import "@sarfas/ui/tokens.css";
 
 :root {
