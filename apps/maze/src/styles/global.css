@@ -156,13 +156,47 @@ a {
   }
 }
 
+/* collapsible header (a <summary>) */
 .code-head {
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
   padding: 0.85rem 1rem;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.code-head::-webkit-details-marker {
+  display: none;
+}
+.code-head::after {
+  content: "▸";
+  margin-left: auto;
+  color: var(--muted);
+  transition: transform 160ms var(--ease);
+}
+.codepanel[open] .code-head::after {
+  transform: rotate(90deg);
+}
+.codepanel[open] .code-head {
   border-bottom: 1px solid var(--border);
+}
+.code-head:hover .code-title {
+  color: var(--accent);
+}
+.code-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--fg);
+}
+.code-sub {
+  font-size: 0.74rem;
+  color: var(--muted);
+}
+@media (max-width: 600px) {
+  .code-sub {
+    display: none;
+  }
 }
 
 .code {

@@ -83,16 +83,25 @@ const repo = "https://github.com/lukesarfas/A-Star-Maze-Algorithm-Solver";
         <div id="a11y-status" class="visually-hidden" role="status" aria-live="polite"></div>
       </section>
 
-      <aside class="codepanel" aria-label="A* algorithm, highlighted as it runs">
-        <div class="code-head">A* · the line running now is highlighted</div>
-        <pre class="code" tabindex="0" aria-label="A* algorithm pseudocode"><code id="code"><span class="cl" data-line="0">function aStar(start, goal):</span>
-<span class="cl" data-line="1">  add start to open    · ordered by f = g + h</span>
-<span class="cl" data-line="2">  while open is not empty:</span>
-<span class="cl" data-line="3">    current ← lowest-f node in open</span>
-<span class="cl" data-line="4">    if current = goal → return path</span>
-<span class="cl" data-line="5">    mark current explored</span>
-<span class="cl" data-line="6">    relax neighbours → add to frontier</span></code></pre>
-      </aside>
+      <details class="codepanel">
+        <summary class="code-head">
+          <span class="code-title">A* algorithm</span>
+          <span class="code-sub">show the code · the running lines highlight live</span>
+        </summary>
+        <pre class="code" tabindex="0" aria-label="A* search — one expansion"><code id="code"><span class="cl" data-group="">expandNext():</span>
+<span class="cl" data-group="pick">  open.sort((a, b) => b.f - a.f)   // by f = g+h</span>
+<span class="cl" data-group="pick">  current = open.pop()             // lowest-f node</span>
+<span class="cl" data-group="goal">  if current === goal:</span>
+<span class="cl" data-group="reconstruct">    return reconstruct(current)    // parents → start</span>
+<span class="cl" data-group="expand">  for each neighbour n of current:</span>
+<span class="cl" data-group="expand">    if n is a wall or off-grid: skip</span>
+<span class="cl" data-group="expand">    n.g = current.g + 1            // steps so far</span>
+<span class="cl" data-group="expand">    n.h = manhattan(n, goal)       // estimate left</span>
+<span class="cl" data-group="expand">    n.f = n.g + n.h</span>
+<span class="cl" data-group="expand">    if a cheaper path to n exists: skip</span>
+<span class="cl" data-group="expand">    open.push(n)                   // join the frontier</span>
+<span class="cl" data-group="close">  closed.push(current)             // mark explored</span></code></pre>
+      </details>
     </section>
 
     <section class="section">

@@ -6,15 +6,17 @@ import { createSolver, PHASE } from "./solver.js";
 
 const $ = (id) => document.getElementById(id);
 
-// Pseudocode line highlighting, kept in sync with the solver's active line.
+// Highlight the group of code lines currently executing (kept in sync with the
+// solver). A group such as "expand" spans several lines, so every line that
+// runs at that phase lights up together.
 const lineEls = Array.from(document.querySelectorAll("#code .cl"));
-let activeLineEl = null;
-function highlightLine(line) {
-  const next = line >= 0 ? lineEls.find((el) => Number(el.dataset.line) === line) : null;
-  if (next === activeLineEl) return;
-  if (activeLineEl) activeLineEl.classList.remove("active");
-  if (next) next.classList.add("active");
-  activeLineEl = next || null;
+let shownGroup = null;
+function highlightGroup(group) {
+  if (group === shownGroup) return;
+  for (const el of lineEls) {
+    el.classList.toggle("active", group != null && el.dataset.group === group);
+  }
+  shownGroup = group;
 }
 
 const canvas = $("maze");
@@ -51,7 +53,7 @@ if (canvas) {
               : "Ready";
       setText("stat-status", status || "");
       setText("speed-rate", `${s.stepsPerSecond.toLocaleString()} steps/s`);
-      highlightLine(s.line);
+      highlightGroup(s.codeGroup);
 
       const toggle = $("toggle");
       if (toggle) {

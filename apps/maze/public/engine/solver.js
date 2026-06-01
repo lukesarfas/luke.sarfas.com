@@ -24,10 +24,20 @@ export const PHASE = {
 const MIN_SIZE = 11;
 const MAX_SIZE = 501;
 
-// Each expansion is animated as four micro-steps, one per pseudocode line.
+// Each expansion is animated as four micro-steps that walk the algorithm:
+// pick the lowest-f node → goal test → expand neighbours → mark explored.
 const MICROS_PER_EXPANSION = 4;
-// Pseudocode line indices — must match the data-line attributes in index.astro.
-const LINE = { SETUP: 1, PICK: 3, GOAL: 4, RETURN: 4, CLOSE: 5, NEIGHBOURS: 6 };
+// Code groups — must match the data-group attributes in index.astro. A group
+// can span several real lines (e.g. the whole neighbour loop), so the panel
+// shows every line that runs at each phase.
+const GROUP = {
+  SETUP: "setup",
+  PICK: "pick",
+  GOAL: "goal",
+  RECONSTRUCT: "reconstruct",
+  EXPAND: "expand",
+  CLOSE: "close",
+};
 
 function oddify(n) {
   const v = Math.min(MAX_SIZE, Math.max(MIN_SIZE, Math.floor(n)));
@@ -140,7 +150,7 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
   let goalIdx = 0;
   let microCursor = 0; // micro-steps played during EXPLORING
   let currentCell = 0; // the cell currently being processed (for the head marker)
-  let activeLine = LINE.SETUP; // pseudocode line currently "executing"
+  let activeGroup = GROUP.SETUP; // code group currently "executing"
 
   function clampSpeed(n) {
     return Math.min(100, Math.max(0, Math.floor(n)));
@@ -433,9 +443,10 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
       openPtr++;
     }
   }
-  // Advance the line-by-line walkthrough by `n` micro-steps. Each expansion is
-  // four micros: pick lowest-f → goal test → mark explored → expand neighbours,
-  // each lighting up the matching pseudocode line and doing its effect.
+  // Advance the line-by-line walkthrough by `n` micro-steps. Each expansion
+  // walks the real A* step in order: pick the lowest-f node → goal test →
+  // expand neighbours (frontier) → mark current explored. Each micro lights up
+  // the matching group of code lines and performs exactly that effect.
   function advanceMicros(n) {
     const totalMicros = order.length * MICROS_PER_EXPANSION;
     for (let i = 0; i < n && microCursor < totalMicros; i++) {
@@ -443,21 +454,27 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
       const m = microCursor % MICROS_PER_EXPANSION;
       if (m === 0) {
         currentCell = order[exp];
-        activeLine = LINE.PICK;
+        activeGroup = GROUP.PICK;
       } else if (m === 1) {
-        activeLine = order[exp] === goalIdx ? LINE.RETURN : LINE.GOAL;
+        if (order[exp] === goalIdx) {
+          // Goal popped → return the path; the loop exits without expanding it.
+          activeGroup = GROUP.RECONSTRUCT;
+          microCursor = totalMicros;
+          break;
+        }
+        activeGroup = GROUP.GOAL;
       } else if (m === 2) {
-        paintCloseStep(exp);
-        activeLine = LINE.CLOSE;
+        paintOpenStep(exp); // expand neighbours → they join the frontier
+        activeGroup = GROUP.EXPAND;
       } else {
-        paintOpenStep(exp);
-        activeLine = LINE.NEIGHBOURS;
+        paintCloseStep(exp); // mark current explored
+        activeGroup = GROUP.CLOSE;
       }
       microCursor++;
     }
     if (microCursor >= totalMicros) {
       phase = found ? PHASE.REVEALING : PHASE.NO_PATH;
-      if (found) activeLine = LINE.RETURN;
+      if (found) activeGroup = GROUP.RECONSTRUCT;
     }
   }
 
@@ -490,7 +507,7 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
       total: order ? order.length : 0,
       progress: order && order.length ? closedShown / order.length : 0,
       stepsPerSecond: targetSPS(),
-      line: activeLine,
+      codeGroup: activeGroup,
     };
   }
   function emit() {
@@ -544,7 +561,7 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
     advanceReveal(path.length);
     microCursor = order.length * MICROS_PER_EXPANSION;
     phase = found ? PHASE.SOLVED : PHASE.NO_PATH;
-    activeLine = found ? LINE.RETURN : LINE.GOAL;
+    activeGroup = found ? GROUP.RECONSTRUCT : GROUP.GOAL;
     running = false;
     safeDraw();
     emit();
@@ -586,7 +603,7 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
     revealIdx = 0;
     microCursor = 0;
     currentCell = order ? order[0] : 0;
-    activeLine = LINE.SETUP;
+    activeGroup = GROUP.SETUP;
     phase = PHASE.EXPLORING;
     errored = false;
     paintBase();
