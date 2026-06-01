@@ -1,0 +1,167 @@
+---
+import Base from "~/layouts/Base.astro";
+
+const repo = "https://github.com/lukesarfas/A-Star-Maze-Algorithm-Solver";
+---
+
+<Base
+  title="A* Maze Solver · Luke Sarfas"
+  description="Watch A* find its way out of a randomly generated maze — recursive-backtracking generation, A* pathfinding with a Manhattan heuristic, rendered live to a canvas."
+>
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <span class="eyebrow">Algorithms · Visualisation</span>
+        <h1>A* Maze Solver</h1>
+        <p class="lede">
+          A maze is carved with recursive backtracking, then A* searches for the
+          exit — biased toward the goal by a Manhattan-distance heuristic. The
+          explored cells, the live frontier, and the shortest path are drawn as
+          it runs.
+        </p>
+        <div class="actions">
+          <a class="btn btn-primary" href={repo} target="_blank" rel="noopener">
+            Source on GitHub <span aria-hidden="true">↗</span>
+          </a>
+          <a class="btn" href="https://luke.sarfas.com">← luke.sarfas.com</a>
+        </div>
+      </div>
+
+      <div class="demo">
+        <canvas id="maze" aria-label="A* maze solver visualisation"></canvas>
+
+        <div class="controls">
+          <button class="btn" id="toggle" type="button">Pause</button>
+          <button class="btn" id="step" type="button">Step</button>
+          <button class="btn" id="new" type="button">New maze</button>
+          <span class="spacer"></span>
+          <label>
+            Size
+            <select id="size">
+              <option value="21">21×21</option>
+              <option value="31">31×31</option>
+              <option value="41" selected>41×41</option>
+              <option value="51">51×51</option>
+            </select>
+          </label>
+          <label>
+            Speed
+            <input id="speed" type="range" min="1" max="30" value="6" />
+          </label>
+        </div>
+
+        <div class="statbar">
+          <span>Explored <b id="stat-explored">0</b></span>
+          <span>Frontier <b id="stat-frontier">0</b></span>
+          <span>Path <b id="stat-path">—</b></span>
+          <span id="stat-status">Searching…</span>
+        </div>
+
+        <ul class="legend">
+          <li><span class="swatch" style="background: var(--maze-start)"></span>Start</li>
+          <li><span class="swatch" style="background: var(--maze-goal)"></span>Goal</li>
+          <li><span class="swatch" style="background: var(--maze-explored)"></span>Explored</li>
+          <li><span class="swatch" style="background: var(--maze-frontier)"></span>Frontier</li>
+          <li><span class="swatch" style="background: var(--maze-path)"></span>Path</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>How it works</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>1 · Build the maze</h3>
+          <p>
+            Recursive backtracking carves corridors from a solid grid, stepping
+            two cells at a time and backtracking at dead ends. The result is a
+            <em>perfect</em> maze — exactly one route between any two cells.
+          </p>
+        </div>
+        <div class="card">
+          <h3>2 · Score every cell</h3>
+          <p>
+            A* ranks open cells by <code>f = g + h</code>: the steps taken so far
+            (<code>g</code>) plus the Manhattan distance left to the goal
+            (<code>h</code>). The heuristic keeps the search pointed at the exit.
+          </p>
+        </div>
+        <div class="card">
+          <h3>3 · Expand the best</h3>
+          <p>
+            Each tick expands the lowest-<code>f</code> cell and queues its
+            neighbours. When the goal pops off the queue, parent pointers are
+            walked back to reveal the shortest path.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <h2>Two implementations</h2>
+      <div class="cards">
+        <div class="card">
+          <h3>Python · pygame</h3>
+          <p>
+            The original desktop program. The same maze and search, animated in
+            a pygame window. Lives in <code>python/</code> in the repo.
+          </p>
+        </div>
+        <div class="card">
+          <h3>JavaScript · canvas</h3>
+          <p>
+            A faithful, file-for-file port that runs here in the browser —
+            verified to produce the same path and node-expansion count as the
+            Python on identical mazes.
+          </p>
+        </div>
+        <div class="card">
+          <h3>Same core</h3>
+          <p>
+            Both share one structure: <code>maze</code> generates,
+            <code>astar</code> searches a node at a time, <code>agent</code>
+            steps it forward, <code>main</code> renders.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site">
+      <span>A* Maze Solver — by Luke Sarfas</span>
+      <a href={repo} target="_blank" rel="noopener">github.com/lukesarfas/A-Star-Maze-Algorithm-Solver ↗</a>
+    </footer>
+  </main>
+
+  <script type="module" is:inline>
+    import { createSolver } from "./engine/solver.js";
+
+    const $ = (id) => document.getElementById(id);
+    const canvas = $("maze");
+
+    const solver = createSolver({
+      canvas,
+      size: 41,
+      speed: 6,
+      onStats(s) {
+        $("stat-explored").textContent = s.explored;
+        $("stat-frontier").textContent = s.frontier;
+        $("stat-path").textContent = s.found ? s.pathLength : "—";
+        $("stat-status").textContent = s.found
+          ? "Solved"
+          : s.running
+            ? "Searching…"
+            : "Paused";
+        $("toggle").textContent = s.found ? "Solved" : s.running ? "Pause" : "Play";
+        $("toggle").disabled = s.found;
+      },
+    });
+
+    $("toggle").addEventListener("click", () => solver.toggle());
+    $("step").addEventListener("click", () => solver.step());
+    $("new").addEventListener("click", () => solver.regenerate());
+    $("speed").addEventListener("input", (e) => solver.setSpeed(Number(e.target.value)));
+    $("size").addEventListener("change", (e) => solver.setSize(Number(e.target.value)));
+
+    solver.play();
+  </script>
+</Base>

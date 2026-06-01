@@ -20,6 +20,7 @@ const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const SITES = [
   { slug: "lickme", workspace: "lickme-site", port: 4322 },
   { slug: "thinkwell", workspace: "thinkwell-site", port: 4323 },
+  { slug: "maze", workspace: "maze-site", port: 4324 },
 ];
 
 async function waitForPort(port, timeoutMs = 20_000) {

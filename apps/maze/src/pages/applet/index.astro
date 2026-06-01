@@ -1,0 +1,174 @@
+---
+const title = "A* Maze Solver — embed";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <style>
+      :root {
+        --bg: #14161c;
+        --panel: #1b1e26;
+        --fg: #eef0f5;
+        --muted: #9aa1b2;
+        --line: #2a2e3a;
+        --accent: #f0b429;
+        /* maze palette, read by solver.js */
+        --maze-bg: #14161c;
+        --maze-wall: #2a2e3a;
+        --maze-explored: rgba(150, 160, 190, 0.20);
+        --maze-frontier: rgba(240, 180, 41, 0.30);
+        --maze-path: #f0b429;
+        --maze-start: #34d399;
+        --maze-goal: #f87171;
+        --maze-agent: #60a5fa;
+      }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; }
+      body {
+        background: var(--bg);
+        color: var(--fg);
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+      }
+      .stage {
+        display: flex;
+        gap: 18px;
+        align-items: stretch;
+        width: 100%;
+        height: 100%;
+        max-height: 620px;
+      }
+      .board {
+        flex: 0 0 auto;
+        height: 100%;
+        aspect-ratio: 1 / 1;
+        background: var(--maze-bg);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        overflow: hidden;
+      }
+      canvas { display: block; width: 100%; height: 100%; }
+      .panel {
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        justify-content: center;
+      }
+      .panel h1 {
+        margin: 0;
+        font-size: 17px;
+        letter-spacing: -0.01em;
+      }
+      .panel p {
+        margin: 0;
+        font-size: 12.5px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .stats { display: grid; gap: 8px; }
+      .stat {
+        display: flex;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--muted);
+        border-bottom: 1px dashed var(--line);
+        padding-bottom: 6px;
+      }
+      .stat b { color: var(--fg); font-variant-numeric: tabular-nums; }
+      .row { display: flex; gap: 8px; flex-wrap: wrap; }
+      button {
+        flex: 1;
+        padding: 8px 10px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--panel);
+        color: var(--fg);
+        font: inherit;
+        font-size: 12.5px;
+        cursor: pointer;
+      }
+      button:hover { border-color: var(--accent); }
+      a.repo {
+        font-size: 11.5px;
+        color: var(--muted);
+        text-decoration: none;
+      }
+      a.repo:hover { color: var(--accent); }
+      @media (max-width: 540px) {
+        .stage { flex-direction: column; max-height: none; }
+        .board { height: auto; width: 100%; }
+        .panel { justify-content: flex-start; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="stage">
+      <div class="board"><canvas id="maze" aria-label="A* maze solver"></canvas></div>
+      <div class="panel">
+        <h1>A* Maze Solver</h1>
+        <p>Recursive-backtracking maze, solved with A* and a Manhattan heuristic. Gold is the frontier; the bright line is the shortest path.</p>
+        <div class="stats">
+          <div class="stat"><span>Explored</span><b id="s-explored">0</b></div>
+          <div class="stat"><span>Frontier</span><b id="s-frontier">0</b></div>
+          <div class="stat"><span>Path length</span><b id="s-path">—</b></div>
+        </div>
+        <div class="row">
+          <button id="toggle" type="button">Pause</button>
+          <button id="new" type="button">New maze</button>
+        </div>
+        <a class="repo" href="https://github.com/lukesarfas/A-Star-Maze-Algorithm-Solver" target="_top" rel="noopener">View source ↗</a>
+      </div>
+    </div>
+
+    <script type="module" is:inline>
+      import { createSolver } from "../engine/solver.js";
+
+      const $ = (id) => document.getElementById(id);
+      let loopTimer = null;
+
+      const solver = createSolver({
+        canvas: $("maze"),
+        size: 41,
+        speed: 7,
+        onStats(s) {
+          $("s-explored").textContent = s.explored;
+          $("s-frontier").textContent = s.frontier;
+          $("s-path").textContent = s.found ? s.pathLength : "—";
+          $("toggle").textContent = s.running ? "Pause" : s.found ? "Replay" : "Play";
+          // Keep the embed alive: regenerate a few seconds after solving.
+          if (s.found && loopTimer === null) {
+            loopTimer = setTimeout(() => {
+              loopTimer = null;
+              solver.regenerate();
+            }, 2600);
+          }
+        },
+      });
+
+      $("toggle").addEventListener("click", () => {
+        if (solver.isFound()) {
+          if (loopTimer) { clearTimeout(loopTimer); loopTimer = null; }
+          solver.regenerate();
+        } else {
+          solver.toggle();
+        }
+      });
+      $("new").addEventListener("click", () => {
+        if (loopTimer) { clearTimeout(loopTimer); loopTimer = null; }
+        solver.regenerate();
+      });
+
+      solver.play();
+      try { window.parent?.postMessage({ type: "applet:ready" }, "*"); } catch {}
+    </script>
+  </body>
+</html>

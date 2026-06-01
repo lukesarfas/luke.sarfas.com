@@ -1,0 +1,15 @@
+{
+  "name": "A* Maze Solver",
+  "slug": "maze",
+  "tagline": "Watch A* find its way out of a randomly generated maze.",
+  "description": "A maze generator and pathfinding visualiser. Mazes are carved with recursive backtracking, then solved with A* using a Manhattan-distance heuristic — the explored cells, the live frontier, and the final shortest path animate as the search runs. Built first in Python with pygame, then ported faithfully to JavaScript to run in the browser.",
+  "status": "active",
+  "updated": "2026-06-01",
+  "tags": ["python", "javascript", "algorithms", "canvas"],
+  "links": {
+    "repo": "https://github.com/lukesarfas/A-Star-Maze-Algorithm-Solver",
+    "site": "https://luke.sarfas.com/sites/maze/"
+  },
+  "accent": "#f0b429",
+  "applet": "/sites/maze/applet/"
+}

@@ -1,0 +1,286 @@
+@import "@sarfas/ui/fonts.css";
+@import "@sarfas/ui/tokens.css";
+
+:root {
+  /* Maze palette — read by engine/solver.js via getComputedStyle. */
+  --maze-bg: oklch(0.17 0.013 264);
+  --maze-wall: oklch(0.26 0.016 264);
+  --maze-explored: color-mix(in oklab, var(--muted) 22%, transparent);
+  --maze-frontier: color-mix(in oklab, var(--signature) 26%, transparent);
+  --maze-path: var(--signature);
+  --maze-start: oklch(0.78 0.16 155);
+  --maze-goal: oklch(0.7 0.18 22);
+  --maze-agent: oklch(0.75 0.13 250);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(900px 500px at 80% -120px, color-mix(in oklab, var(--signature) 10%, transparent), transparent 60%),
+    var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+}
+
+.wrap {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 1.25rem;
+}
+
+/* ---- hero ---- */
+.hero {
+  display: grid;
+  gap: 2.5rem;
+  padding: clamp(3rem, 8vw, 6rem) 0 3rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 880px) {
+  .hero {
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+  }
+}
+
+.eyebrow {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.hero h1 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  margin: 0.6rem 0 1rem;
+}
+
+.hero p.lede {
+  color: var(--fg-soft);
+  font-size: clamp(1.02rem, 1.4vw, 1.18rem);
+  max-width: 46ch;
+  margin: 0 0 1.6rem;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 1.05rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--card);
+  color: var(--fg);
+  font-size: 0.94rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 160ms var(--ease), background 160ms var(--ease), border-color 160ms var(--ease);
+}
+
+.btn:hover {
+  background: var(--card-hover);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  background: var(--grad-1);
+  color: #0d0f14;
+  border-color: transparent;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.05);
+}
+
+/* ---- demo card ---- */
+.demo {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--maze-bg);
+  box-shadow: var(--shadow-strong);
+  padding: 0.9rem;
+}
+
+.demo canvas {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  height: auto;
+  border-radius: var(--radius);
+  display: block;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+}
+
+.controls .spacer {
+  flex: 1;
+}
+
+.controls label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.controls input[type="range"] {
+  accent-color: var(--accent);
+}
+
+.controls select {
+  background: var(--card);
+  color: var(--fg);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 0.3rem 0.5rem;
+  font: inherit;
+  font-size: 0.82rem;
+}
+
+.statbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+  margin-top: 0.9rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.statbar b {
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.9rem;
+  margin: 0.9rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.legend li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.swatch {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 3px;
+}
+
+/* ---- explainer ---- */
+.section {
+  padding: 3rem 0;
+  border-top: 1px solid var(--border);
+}
+
+.section h2 {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  letter-spacing: -0.01em;
+  margin: 0 0 1.6rem;
+}
+
+.cards {
+  display: grid;
+  gap: 1.1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 720px) {
+  .cards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  padding: 1.3rem;
+}
+
+.card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+}
+
+.card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.card code {
+  font-family: var(--font-mono);
+  font-size: 0.85em;
+  color: var(--fg-soft);
+  background: var(--bg-2);
+  padding: 0.05rem 0.3rem;
+  border-radius: 5px;
+}
+
+footer.site {
+  padding: 2.5rem 0 3.5rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.88rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+}
+
+footer.site a {
+  color: var(--fg-soft);
+  text-decoration: none;
+}
+
+footer.site a:hover {
+  color: var(--accent);
+}
