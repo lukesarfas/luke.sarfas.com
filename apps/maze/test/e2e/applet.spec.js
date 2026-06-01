@@ -29,7 +29,7 @@ async function canvasIsNonBlank(page) {
 }
 
 test("applet launches clean and renders", async ({ page, pageErrors }) => {
-  const response = await page.goto("/applet/");
+  const response = await page.goto("/sites/maze/applet/");
   expect(response, "navigation produced a response").toBeTruthy();
   expect(response.status(), "HTTP status should be < 400").toBeLessThan(400);
 

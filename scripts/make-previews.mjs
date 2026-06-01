@@ -18,24 +18,25 @@ const ROOT = resolve(__dirname, "..");
 const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 
 const SITES = [
-  { slug: "lickme", workspace: "lickme-site", port: 4322 },
-  { slug: "thinkwell", workspace: "thinkwell-site", port: 4323 },
-  { slug: "maze", workspace: "maze-site", port: 4324 },
+  { slug: "lickme", workspace: "lickme-site", port: 4322, path: "/" },
+  { slug: "thinkwell", workspace: "thinkwell-site", port: 4323, path: "/" },
+  // maze is built with base "/sites/maze", so its homepage is served there.
+  { slug: "maze", workspace: "maze-site", port: 4324, path: "/sites/maze/" },
 ];
 
-async function waitForPort(port, timeoutMs = 20_000) {
+async function waitForPort(port, path = "/", timeoutMs = 20_000) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
     try {
-      const r = await fetch(`http://localhost:${port}/`);
+      const r = await fetch(`http://localhost:${port}${path}`);
       if (r.ok) return;
     } catch {}
     await new Promise((r) => setTimeout(r, 400));
   }
-  throw new Error(`Timed out waiting for :${port}`);
+  throw new Error(`Timed out waiting for :${port}${path}`);
 }
 
-async function screenshot(slug, port) {
+async function screenshot(slug, port, path = "/") {
   const out = join(ROOT, "apps", slug, "public", "preview.png");
   await new Promise((res, rej) => {
     const c = spawn(
@@ -48,7 +49,7 @@ async function screenshot(slug, port) {
         `--screenshot=${out}`,
         "--window-size=1600,900",
         "--virtual-time-budget=4000",
-        `http://localhost:${port}/`,
+        `http://localhost:${port}${path}`,
       ],
       { stdio: "inherit" },
     );
@@ -57,7 +58,7 @@ async function screenshot(slug, port) {
   return out;
 }
 
-for (const { slug, workspace, port } of SITES) {
+for (const { slug, workspace, port, path = "/" } of SITES) {
   const distDir = join(ROOT, "apps", slug, "dist");
   if (!existsSync(distDir)) {
     console.warn(`[preview] ${slug}: no dist/, run build:${slug} first — skipping`);
@@ -70,9 +71,9 @@ for (const { slug, workspace, port } of SITES) {
     detached: true,
   });
   try {
-    await waitForPort(port);
+    await waitForPort(port, path);
     await new Promise((r) => setTimeout(r, 600));
-    const out = await screenshot(slug, port);
+    const out = await screenshot(slug, port, path);
     console.log(`[preview] ${slug}: saved ${out}`);
   } finally {
     try {

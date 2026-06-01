@@ -143,5 +143,8 @@ const repo = "https://github.com/lukesarfas/A-Star-Maze-Algorithm-Solver";
     </footer>
   </main>
 
-  <script type="module" src="./engine/app.js" is:inline></script>
+  <!-- Absolute path: works whether the page is served at /sites/maze or
+       /sites/maze/ (Firebase 301s the trailing slash away). Module-to-module
+       imports inside app.js resolve relative to app.js, so they're fine too. -->
+  <script type="module" src="/sites/maze/engine/app.js" is:inline></script>
 </Base>

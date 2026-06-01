@@ -41,7 +41,7 @@ async function canvasIsNonBlank(page) {
 }
 
 test("showcase launches clean", async ({ page, pageErrors }) => {
-  const response = await page.goto("/");
+  const response = await page.goto("/sites/maze/");
   expect(response, "navigation produced a response").toBeTruthy();
   expect(response.status(), "HTTP status should be < 400").toBeLessThan(400);
 
@@ -53,7 +53,7 @@ test("showcase launches clean", async ({ page, pageErrors }) => {
 });
 
 test("canvas renders (non-blank)", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/sites/maze/");
   await expect(page.locator("canvas#maze")).toBeVisible();
   await page.waitForLoadState("networkidle");
 
@@ -67,7 +67,7 @@ test("canvas renders (non-blank)", async ({ page }) => {
 });
 
 test("all controls visible and operable", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/sites/maze/");
   await expect(page.locator("canvas#maze")).toBeVisible();
 
   for (const sel of ["#toggle", "#step", "#new", "#size", "#speed"]) {
@@ -76,17 +76,25 @@ test("all controls visible and operable", async ({ page }) => {
     await expect(el, `${sel} enabled`).toBeEnabled();
   }
 
+  // The engine must actually be running (this is what the production
+  // trailing-slash 404 broke: explored stayed stuck at 0). Wait for the search
+  // to make progress.
+  const explored = () => page.locator("#stat-explored").evaluate((el) => Number(el.textContent));
+  await expect
+    .poll(explored, { message: "search should advance (explored > 0)", timeout: 10000 })
+    .toBeGreaterThan(0);
+
+  // "New maze" must regenerate: explored resets, then climbs again.
+  await expect.poll(explored, { timeout: 10000 }).toBeGreaterThan(20);
+  const before = await explored();
   await page.locator("#new").click();
   await expect
-    .poll(async () => (await page.locator("#stat-status").textContent())?.trim() ?? "", {
-      message: "#stat-status should be non-empty after generating a new maze",
-      timeout: 10000,
-    })
-    .not.toBe("");
+    .poll(explored, { message: "New maze should reset the explored count", timeout: 5000 })
+    .toBeLessThan(before);
 });
 
 test("search completes", async ({ page }) => {
-  await page.goto("/");
+  await page.goto("/sites/maze/");
   await expect(page.locator("canvas#maze")).toBeVisible();
 
   // Crank the speed slider to its max so the solve plays back fast, firing the

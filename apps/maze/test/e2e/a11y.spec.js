@@ -14,7 +14,7 @@ async function scan(page, path) {
 }
 
 test("showcase has no accessibility violations", async ({ page }) => {
-  const results = await scan(page, "/");
+  const results = await scan(page, "/sites/maze/");
   expect(
     results.violations,
     `axe violations on /:\n${JSON.stringify(results.violations, null, 2)}`,
@@ -22,7 +22,7 @@ test("showcase has no accessibility violations", async ({ page }) => {
 });
 
 test("applet has no accessibility violations", async ({ page }) => {
-  const results = await scan(page, "/applet/");
+  const results = await scan(page, "/sites/maze/applet/");
   expect(
     results.violations,
     `axe violations on /applet/:\n${JSON.stringify(results.violations, null, 2)}`,

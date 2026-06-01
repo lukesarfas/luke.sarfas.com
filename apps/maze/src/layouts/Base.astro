@@ -7,8 +7,10 @@ interface Props {
   description: string;
   path?: string;
 }
-const { title, description, path = "/" } = Astro.props;
-const url = new URL(path, Astro.site ?? "https://luke.sarfas.com").toString();
+const { title, description, path = "/sites/maze/" } = Astro.props;
+const site = Astro.site ?? new URL("https://luke.sarfas.com");
+const url = new URL(path, site).toString();
+const ogImage = new URL("/sites/maze/preview.png", site).toString();
 ---
 
 <!doctype html>
@@ -17,8 +19,8 @@ const url = new URL(path, Astro.site ?? "https://luke.sarfas.com").toString();
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#0e0f13" />
-    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <MetaTags title={title} description={description} url={url} image="./preview.png" imageAlt="A* maze solver" />
+    <link rel="icon" href="/sites/maze/favicon.svg" type="image/svg+xml" />
+    <MetaTags title={title} description={description} url={url} image={ogImage} imageAlt="A* maze solver" />
   </head>
   <body>
     <slot />

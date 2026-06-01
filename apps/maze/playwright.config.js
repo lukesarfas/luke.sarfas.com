@@ -18,6 +18,8 @@ export default defineConfig({
   reporter: "list",
 
   use: {
+    // The app is served under its hub mount path (base: "/sites/maze"); specs
+    // navigate to absolute /sites/maze/... URLs, matching production.
     baseURL: "http://localhost:4324",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
@@ -33,7 +35,8 @@ export default defineConfig({
   webServer: {
     command: "npm run build && npm run preview",
     cwd: __dirname,
-    url: "http://localhost:4324",
+    // astro preview serves under the configured base, so readiness is the mount.
+    url: "http://localhost:4324/sites/maze/",
     timeout: 120000,
     reuseExistingServer: !process.env.CI,
   },

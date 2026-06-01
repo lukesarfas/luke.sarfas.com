@@ -11,7 +11,7 @@ async function status(page) {
 }
 
 test("Space toggles play/pause; 'n' starts a new maze", async ({ page, pageErrors }) => {
-  await page.goto("/");
+  await page.goto("/sites/maze/");
   await expect(page.locator("canvas#maze")).toBeVisible();
 
   const canvas = page.locator("canvas#maze");
