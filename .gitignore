@@ -14,3 +14,9 @@ firebase-debug.log
 apps/luke.sarfas.com/public/sites/
 apps/luke.sarfas.com/public/previews/
 apps/luke.sarfas.com/public/manifests/
+
+# test artifacts
+**/test-results/
+**/playwright-report/
+**/coverage/
+**/.last-run.json

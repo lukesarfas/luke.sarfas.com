@@ -2,19 +2,72 @@
 @import "@sarfas/ui/tokens.css";
 
 :root {
-  /* Maze palette — read by engine/solver.js via getComputedStyle. */
-  --maze-bg: oklch(0.17 0.013 264);
-  --maze-wall: oklch(0.26 0.016 264);
-  --maze-explored: color-mix(in oklab, var(--muted) 22%, transparent);
-  --maze-frontier: color-mix(in oklab, var(--signature) 26%, transparent);
-  --maze-path: var(--signature);
-  --maze-start: oklch(0.78 0.16 155);
-  --maze-goal: oklch(0.7 0.18 22);
-  --maze-agent: oklch(0.75 0.13 250);
+  /* Maze palette — read by engine/solver.js via getComputedStyle.
+     Colour-blind-safe hues (blue explored vs amber frontier) chosen with a
+     luminance gap so every adjacent state pair clears WCAG 1.4.11 (≥3:1)
+     against the dark background: wall 3.4, explored 3.1, frontier 11.3,
+     explored↔frontier 3.7, path↔explored 4.6. See docs/UX.md. */
+  --maze-bg: #15171d;
+  --maze-wall: #646b85; /* light slate — the maze structure */
+  --maze-explored: #356a90; /* dark blue — searched cells */
+  --maze-frontier: #f0c878; /* light amber — the open frontier */
+  --maze-path: #f4e84a; /* bright yellow — the reveal */
+  --maze-start: #15c487; /* bluish-green */
+  --maze-goal: #e7672e; /* vermillion */
+  --maze-current: #ffffff;
 }
 
 * {
   box-sizing: border-box;
+}
+
+/* Accessible focus ring for keyboard users. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+kbd {
+  font-family: var(--font-mono);
+  font-size: 0.78em;
+  background: var(--bg-2);
+  border: 1px solid var(--border-strong);
+  border-bottom-width: 2px;
+  border-radius: 5px;
+  padding: 0.05em 0.4em;
+  color: var(--fg-soft);
+}
+
+.kbd-hint {
+  margin: 0.85rem 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
 }
 
 html {
@@ -157,8 +210,15 @@ a {
   color: var(--muted);
 }
 
+/* Comfortable touch targets (WCAG 2.5.8): controls are at least 44px tall. */
+.controls .btn {
+  min-height: 44px;
+}
+
 .controls input[type="range"] {
   accent-color: var(--accent);
+  height: 24px; /* enlarge the pointer hit area around the thumb */
+  cursor: pointer;
 }
 
 .controls select {
@@ -167,8 +227,10 @@ a {
   border: 1px solid var(--border-strong);
   border-radius: 8px;
   padding: 0.3rem 0.5rem;
+  min-height: 44px;
   font: inherit;
   font-size: 0.82rem;
+  cursor: pointer;
 }
 
 .statbar {
@@ -209,6 +271,8 @@ a {
   width: 0.85rem;
   height: 0.85rem;
   border-radius: 3px;
+  border: 1px solid var(--border-strong);
+  flex: none;
 }
 
 /* ---- explainer ---- */

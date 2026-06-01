@@ -27,26 +27,29 @@ const repo = "https://github.com/lukesarfas/A-Star-Maze-Algorithm-Solver";
         </div>
       </div>
 
-      <div class="demo">
-        <canvas id="maze" aria-label="A* maze solver visualisation"></canvas>
+      <section class="demo" aria-label="Interactive A* maze solver">
+        <canvas
+          id="maze"
+          role="img"
+          tabindex="0"
+          aria-label="A maze with the A* search animating: explored cells, the search frontier, and the shortest path from start to goal."
+        ></canvas>
 
-        <div class="controls">
-          <button class="btn" id="toggle" type="button">Pause</button>
+        <div class="controls" role="group" aria-label="Visualiser controls">
+          <button class="btn" id="toggle" type="button" aria-pressed="false">Pause</button>
           <button class="btn" id="step" type="button">Step</button>
           <button class="btn" id="new" type="button">New maze</button>
           <span class="spacer"></span>
-          <label>
-            Size
-            <select id="size">
+          <label for="size">Size
+            <select id="size" aria-label="Maze size">
               <option value="21">21×21</option>
               <option value="31">31×31</option>
               <option value="41" selected>41×41</option>
               <option value="51">51×51</option>
             </select>
           </label>
-          <label>
-            Speed
-            <input id="speed" type="range" min="1" max="30" value="6" />
+          <label for="speed">Speed
+            <input id="speed" type="range" min="1" max="30" value="6" aria-label="Animation speed" />
           </label>
         </div>
 
@@ -54,17 +57,25 @@ const repo = "https://github.com/lukesarfas/A-Star-Maze-Algorithm-Solver";
           <span>Explored <b id="stat-explored">0</b></span>
           <span>Frontier <b id="stat-frontier">0</b></span>
           <span>Path <b id="stat-path">—</b></span>
+          <span aria-hidden="true">·</span>
           <span id="stat-status">Searching…</span>
         </div>
 
-        <ul class="legend">
+        <ul class="legend" aria-label="Legend">
           <li><span class="swatch" style="background: var(--maze-start)"></span>Start</li>
           <li><span class="swatch" style="background: var(--maze-goal)"></span>Goal</li>
           <li><span class="swatch" style="background: var(--maze-explored)"></span>Explored</li>
           <li><span class="swatch" style="background: var(--maze-frontier)"></span>Frontier</li>
           <li><span class="swatch" style="background: var(--maze-path)"></span>Path</li>
         </ul>
-      </div>
+
+        <p class="kbd-hint">
+          Keyboard: <kbd>Space</kbd> play/pause · <kbd>→</kbd> step · <kbd>R</kbd> replay · <kbd>N</kbd> new maze
+        </p>
+
+        <!-- Screen-reader status; updated on meaningful transitions only. -->
+        <div id="a11y-status" class="visually-hidden" role="status" aria-live="polite"></div>
+      </section>
     </section>
 
     <section class="section">
@@ -132,36 +143,5 @@ const repo = "https://github.com/lukesarfas/A-Star-Maze-Algorithm-Solver";
     </footer>
   </main>
 
-  <script type="module" is:inline>
-    import { createSolver } from "./engine/solver.js";
-
-    const $ = (id) => document.getElementById(id);
-    const canvas = $("maze");
-
-    const solver = createSolver({
-      canvas,
-      size: 41,
-      speed: 6,
-      onStats(s) {
-        $("stat-explored").textContent = s.explored;
-        $("stat-frontier").textContent = s.frontier;
-        $("stat-path").textContent = s.found ? s.pathLength : "—";
-        $("stat-status").textContent = s.found
-          ? "Solved"
-          : s.running
-            ? "Searching…"
-            : "Paused";
-        $("toggle").textContent = s.found ? "Solved" : s.running ? "Pause" : "Play";
-        $("toggle").disabled = s.found;
-      },
-    });
-
-    $("toggle").addEventListener("click", () => solver.toggle());
-    $("step").addEventListener("click", () => solver.step());
-    $("new").addEventListener("click", () => solver.regenerate());
-    $("speed").addEventListener("input", (e) => solver.setSpeed(Number(e.target.value)));
-    $("size").addEventListener("change", (e) => solver.setSize(Number(e.target.value)));
-
-    solver.play();
-  </script>
+  <script type="module" src="./engine/app.js" is:inline></script>
 </Base>

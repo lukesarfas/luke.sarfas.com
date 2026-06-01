@@ -8,10 +8,16 @@
     "start": "astro dev --port 4324",
     "build": "astro build",
     "preview": "astro preview --port 4324",
-    "astro": "astro"
+    "astro": "astro",
+    "test:e2e": "playwright test",
+    "test:smoke": "playwright test test/e2e/smoke.spec.js --project=chromium"
   },
   "dependencies": {
     "@sarfas/ui": "*",
     "astro": "^4.16.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.11.3",
+    "@playwright/test": "1.60.0"
   }
 }
