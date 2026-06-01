@@ -48,13 +48,13 @@
         ]
       },
       {
-        "source": "/sites/maze/**",
+        "source": "/sites/maze{,/**}",
         "headers": [
           { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'self' https://luke.sarfas.com; upgrade-insecure-requests" }
         ]
       },
       {
-        "source": "/sites/maze/applet/**",
+        "source": "/sites/maze/applet{,/**}",
         "headers": [
           { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'self' https://luke.sarfas.com; upgrade-insecure-requests" },
           { "key": "Cross-Origin-Resource-Policy", "value": "cross-origin" }
