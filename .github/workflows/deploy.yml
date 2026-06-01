@@ -18,9 +18,9 @@ jobs:
   build-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 20
           cache: npm
@@ -29,6 +29,16 @@ jobs:
 
       - name: Build all sites + hub
         run: npm run build
+
+      # --- Launch-smoke gate -------------------------------------------------
+      # Runs after the build and BEFORE deploy, in the same job and sequentially,
+      # so a smoke failure blocks the Firebase deploy. The test:smoke script is
+      # defined in maze-site's package.json (owned by another agent).
+      - name: Install Playwright browser (chromium)
+        run: npx playwright install --with-deps chromium
+
+      - name: Launch smoke test
+        run: npm --workspace maze-site run test:smoke
 
       - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
