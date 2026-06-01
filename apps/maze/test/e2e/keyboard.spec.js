@@ -17,9 +17,9 @@ test("Space toggles play/pause; 'n' starts a new maze", async ({ page, pageError
   const canvas = page.locator("canvas#maze");
   const toggle = page.locator("#toggle");
 
-  // Use the largest grid + slowest speed so the search stays in its EXPLORING
+  // Use a larger grid + slowest speed so the search stays in its EXPLORING
   // phase long enough to observe a pause/resume via the keyboard.
-  await page.locator("#size").selectOption("51");
+  await page.locator("#size").fill("51");
   await page.locator("#speed").evaluate((el) => {
     el.value = el.min;
     el.dispatchEvent(new Event("input", { bubbles: true }));

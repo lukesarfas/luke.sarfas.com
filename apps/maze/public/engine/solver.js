@@ -1,19 +1,19 @@
-// solver.js — product renderer for the A* maze showcase.
+// solver.js — high-performance A* maze visualiser for the showcase.
 //
-// Strategy (see docs/SPEC.md §5.2): run the search to completion up front and
-// record an ordered event log, then animate pure playback of that log. This
-// makes pause/step instant, keeps every frame cheap, and guarantees a result
-// exists before the first frame is drawn — so the canvas can never get stuck or
-// crash mid-animation.
+// Scales to large, custom maze sizes (up to ~501x501 ≈ 250k cells) where the
+// faithful linear-scan port would hang. Strategy:
+//   * typed-array maze + binary-heap A* (precomputed up front), recording the
+//     order cells are expanded/discovered and the final path;
+//   * playback is pure animation of that log, so pause/step are instant and a
+//     result is guaranteed before the first frame;
+//   * rendering goes through an offscreen 1px-per-cell ImageData scaled crisply
+//     onto the display canvas, so a frame costs ~O(changed cells), not O(grid).
 //
-// The algorithm core (maze.js / astar.js) is vendored verbatim from
-// https://github.com/lukesarfas/A-Star-Maze-Algorithm-Solver and is never
-// modified here; this file only drives and draws it.
+// The faithful Python/JS reference port lives in the OSS repo; this is the
+// optimised variant that powers the live, resizable visualiser. It produces the
+// same optimal shortest path (unique in a perfect maze).
 
-import { Maze, WALL, START, END } from "./maze.js";
-import { AStarSearch } from "./astar.js";
-
-const PHASE = {
+export const PHASE = {
   EXPLORING: "exploring",
   REVEALING: "revealing",
   SOLVED: "solved",
@@ -21,8 +21,12 @@ const PHASE = {
   ERROR: "error",
 };
 
-function key(x, y) {
-  return x + "," + y;
+const MIN_SIZE = 11;
+const MAX_SIZE = 501;
+
+function oddify(n) {
+  const v = Math.min(MAX_SIZE, Math.max(MIN_SIZE, Math.floor(n)));
+  return v % 2 === 0 ? v + 1 : v;
 }
 
 function prefersReducedMotion() {
@@ -33,21 +37,56 @@ function prefersReducedMotion() {
   );
 }
 
+// Parse "#rgb" / "#rrggbb" / "rgb(...)" / "rgba(...)" into [r,g,b] (0-255),
+// compositing any alpha over the given background.
+function parseColour(str, bg) {
+  str = (str || "").trim();
+  let r = 0;
+  let g = 0;
+  let b = 0;
+  let a = 1;
+  if (str[0] === "#") {
+    let h = str.slice(1);
+    if (h.length === 3) h = h[0] + h[0] + h[1] + h[1] + h[2] + h[2];
+    r = parseInt(h.slice(0, 2), 16);
+    g = parseInt(h.slice(2, 4), 16);
+    b = parseInt(h.slice(4, 6), 16);
+  } else if (str.startsWith("rgb")) {
+    const m = str.match(/[\d.]+/g) || [];
+    r = +m[0] || 0;
+    g = +m[1] || 0;
+    b = +m[2] || 0;
+    a = m[3] !== undefined ? +m[3] : 1;
+  }
+  if (a < 1 && bg) {
+    r = Math.round(r * a + bg[0] * (1 - a));
+    g = Math.round(g * a + bg[1] * (1 - a));
+    b = Math.round(b * a + bg[2] * (1 - a));
+  }
+  return [r, g, b];
+}
+
 function readColours(el) {
   const cs = getComputedStyle(el);
   const get = (name, fallback) => cs.getPropertyValue(name).trim() || fallback;
-  // Colour-blind-safe palette with a luminance gap so adjacent states clear
-  // WCAG 1.4.11 (≥3:1). Fallbacks match the CSS custom properties in
-  // global.css / the applet's inline styles. See docs/UX.md.
-  return {
+  const css = {
     background: get("--maze-bg", "#15171d"),
-    wall: get("--maze-wall", "#646b85"), // light slate
-    explored: get("--maze-explored", "#356a90"), // dark blue
-    frontier: get("--maze-frontier", "#f0c878"), // light amber
-    path: get("--maze-path", "#f4e84a"), // bright yellow
-    start: get("--maze-start", "#15c487"), // bluish-green
-    goal: get("--maze-goal", "#e7672e"), // vermillion
+    wall: get("--maze-wall", "#646b85"),
+    explored: get("--maze-explored", "#356a90"),
+    frontier: get("--maze-frontier", "#f0c878"),
+    path: get("--maze-path", "#f4e84a"),
+    start: get("--maze-start", "#15c487"),
+    goal: get("--maze-goal", "#e7672e"),
     current: get("--maze-current", "#ffffff"),
+  };
+  const bg = parseColour(css.background);
+  return {
+    css,
+    bg,
+    wall: parseColour(css.wall, bg),
+    explored: parseColour(css.explored, bg),
+    frontier: parseColour(css.frontier, bg),
+    path: parseColour(css.path, bg),
   };
 }
 
@@ -59,155 +98,340 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
   const report = typeof onState === "function" ? onState : () => {};
 
   let colours = readColours(canvas);
-  let cols = oddify(size);
+  let N = oddify(size);
   let speedSteps = clampSpeed(speed);
 
-  // Precomputed run state.
-  let maze = null;
-  let frames = []; // one per expanded node: { current:[x,y], frontier:[[x,y]...] }
-  let path = []; // final shortest path ([] if none)
+  // Precomputed run (typed arrays sized N*N).
+  let grid = null; // Uint8Array, 1 = wall, 0 = open
+  let sx = 1;
+  let sy = 1;
+  let ex = 0;
+  let ey = 0;
+  let order = null; // Int32Array — cells in expansion (closed) order
+  let openOrder = null; // Int32Array — cells in discovery order
+  let openStep = null; // Int32Array — expansion index at which a cell was discovered
+  let closedAt = null; // Int32Array — expansion index at which a cell was closed (-1 if never)
+  let path = null; // Int32Array — shortest path, start..goal
   let found = false;
+
+  // Offscreen 1px-per-cell buffer.
+  let off = null;
+  let offCtx = null;
+  let img = null;
+  let data = null;
 
   // Playback state.
   let phase = PHASE.EXPLORING;
-  let exploreIndex = 0; // how many frames have been played
-  let revealIndex = 0; // how many path cells have been revealed
-  const exploredSet = new Set(); // accumulates as exploreIndex advances
+  let closedShown = 0; // expansions revealed
+  let openPtr = 0; // index into openOrder revealed
+  let revealIdx = 0; // path cells revealed
   let rafId = null;
   let running = false;
   let errored = false;
 
-  function oddify(n) {
-    const v = Math.max(5, Math.floor(n));
-    return v % 2 === 0 ? v + 1 : v;
-  }
   function clampSpeed(n) {
-    return Math.min(60, Math.max(1, Math.floor(n)));
+    return Math.min(30, Math.max(1, Math.floor(n)));
+  }
+  function heur(idx) {
+    const x = idx % N;
+    const y = (idx / N) | 0;
+    return Math.abs(x - ex) + Math.abs(y - ey);
   }
 
-  // ---- precompute -------------------------------------------------------
-  function precompute() {
-    maze = new Maze(cols, cols);
-    maze.generate();
-    const search = new AStarSearch(maze);
-    frames = [];
-    let guard = 0;
-    const limit = cols * cols * 8; // generous upper bound; prevents any infinite loop
-    while (!search.found && search.openList.length > 0 && guard++ < limit) {
-      search.tickSearch();
-      frames.push({
-        current: [search.currentX, search.currentY],
-        frontier: search.openList.map((n) => [n.position[0], n.position[1]]),
-      });
+  // ---- maze generation (recursive backtracking, typed) ------------------
+  function generate() {
+    grid = new Uint8Array(N * N).fill(1);
+    sx = 1;
+    sy = 1;
+    ex = N - 2;
+    ey = N - 2;
+    const idx = (x, y) => y * N + x;
+    grid[idx(sx, sy)] = 0;
+    const stack = [sx, sy]; // flat (x,y) pairs
+    const dirs = [
+      [0, 1],
+      [1, 0],
+      [0, -1],
+      [-1, 0],
+    ];
+    while (stack.length) {
+      const y = stack[stack.length - 1];
+      const x = stack[stack.length - 2];
+      const cands = [];
+      for (const [dx, dy] of dirs) {
+        const nx = x + dx * 2;
+        const ny = y + dy * 2;
+        if (nx >= 0 && nx < N && ny >= 0 && ny < N && grid[idx(nx, ny)] === 1) {
+          cands.push([nx, ny, dx, dy]);
+        }
+      }
+      if (cands.length) {
+        const [nx, ny, dx, dy] = cands[(Math.random() * cands.length) | 0];
+        grid[idx(x + dx, y + dy)] = 0;
+        grid[idx(nx, ny)] = 0;
+        stack.push(nx, ny);
+      } else {
+        stack.length -= 2;
+      }
     }
-    found = search.found;
-    path = found ? maze.path.slice() : [];
   }
 
-  // ---- layout & drawing -------------------------------------------------
-  let cell = 1;
+  // ---- A* (binary heap, lazy deletion) ----------------------------------
+  function solve() {
+    const n = N * N;
+    const g = new Int32Array(n).fill(0x7fffffff);
+    const state = new Uint8Array(n); // 0 unseen, 1 open, 2 closed
+    const parent = new Int32Array(n).fill(-1);
+    openStep = new Int32Array(n).fill(-1);
+    closedAt = new Int32Array(n).fill(-1);
+    const orderArr = new Int32Array(n);
+    const openArr = new Int32Array(n);
+    let orderLen = 0;
+    let openLen = 0;
+
+    const heap = []; // cell indices; ordered lazily by f then h
+    const f = (c) => g[c] + heur(c);
+    const less = (a, b) => {
+      const fa = f(a);
+      const fb = f(b);
+      return fa !== fb ? fa < fb : heur(a) < heur(b);
+    };
+    const push = (c) => {
+      heap.push(c);
+      let i = heap.length - 1;
+      while (i > 0) {
+        const p = (i - 1) >> 1;
+        if (less(heap[i], heap[p])) {
+          [heap[i], heap[p]] = [heap[p], heap[i]];
+          i = p;
+        } else break;
+      }
+    };
+    const pop = () => {
+      const top = heap[0];
+      const last = heap.pop();
+      if (heap.length) {
+        heap[0] = last;
+        let i = 0;
+        const len = heap.length;
+        for (;;) {
+          const l = 2 * i + 1;
+          const r = l + 1;
+          let m = i;
+          if (l < len && less(heap[l], heap[m])) m = l;
+          if (r < len && less(heap[r], heap[m])) m = r;
+          if (m === i) break;
+          [heap[i], heap[m]] = [heap[m], heap[i]];
+          i = m;
+        }
+      }
+      return top;
+    };
+
+    const startIdx = sy * N + sx;
+    const endIdx = ey * N + ex;
+    g[startIdx] = 0;
+    state[startIdx] = 1;
+    openStep[startIdx] = 0;
+    openArr[openLen++] = startIdx;
+    push(startIdx);
+
+    while (heap.length) {
+      const cur = pop();
+      if (state[cur] === 2) continue; // stale heap entry
+      state[cur] = 2;
+      closedAt[cur] = orderLen;
+      orderArr[orderLen++] = cur;
+      if (cur === endIdx) {
+        found = true;
+        break;
+      }
+      const cx = cur % N;
+      const cy = (cur / N) | 0;
+      const step = closedAt[cur];
+      // neighbours: down, up, right, left
+      for (let d = 0; d < 4; d++) {
+        const nx = cx + (d === 2 ? 1 : d === 3 ? -1 : 0);
+        const ny = cy + (d === 0 ? 1 : d === 1 ? -1 : 0);
+        if (nx < 0 || nx >= N || ny < 0 || ny >= N) continue;
+        const nb = ny * N + nx;
+        if (grid[nb] === 1 || state[nb] === 2) continue;
+        const tentative = g[cur] + 1;
+        if (tentative < g[nb]) {
+          g[nb] = tentative;
+          parent[nb] = cur;
+          if (state[nb] === 0) {
+            state[nb] = 1;
+            openStep[nb] = step;
+            openArr[openLen++] = nb;
+          }
+          push(nb);
+        }
+      }
+    }
+
+    order = orderArr.subarray(0, orderLen);
+    openOrder = openArr.subarray(0, openLen);
+
+    if (found) {
+      const rev = [];
+      let c = endIdx;
+      while (c !== -1) {
+        rev.push(c);
+        c = parent[c];
+      }
+      rev.reverse();
+      path = Int32Array.from(rev);
+    } else {
+      path = new Int32Array(0);
+    }
+  }
+
+  // ---- offscreen buffer + painting --------------------------------------
+  function setupOffscreen() {
+    off = document.createElement("canvas");
+    off.width = N;
+    off.height = N;
+    offCtx = off.getContext("2d");
+    img = offCtx.createImageData(N, N);
+    data = img.data;
+    paintBase();
+  }
+  function paintBase() {
+    const [br, bg_, bb] = colours.bg;
+    const [wr, wg, wb] = colours.wall;
+    for (let i = 0; i < N * N; i++) {
+      const o = i * 4;
+      const wall = grid[i] === 1;
+      data[o] = wall ? wr : br;
+      data[o + 1] = wall ? wg : bg_;
+      data[o + 2] = wall ? wb : bb;
+      data[o + 3] = 255;
+    }
+  }
+  function paintCell(idx, rgb) {
+    const o = idx * 4;
+    data[o] = rgb[0];
+    data[o + 1] = rgb[1];
+    data[o + 2] = rgb[2];
+    data[o + 3] = 255;
+  }
+
+  // ---- drawing ----------------------------------------------------------
   function layout() {
     const dpr = window.devicePixelRatio || 1;
     const px = Math.max(1, Math.floor(canvas.clientWidth));
     canvas.width = px * dpr;
     canvas.height = px * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    cell = px / cols;
   }
-
-  function fill(x, y, colour) {
-    ctx.fillStyle = colour;
-    ctx.fillRect(x * cell, y * cell, Math.ceil(cell) - 0.5, Math.ceil(cell) - 0.5);
-  }
-
-  function draw() {
-    const px = canvas.clientWidth;
-    ctx.fillStyle = colours.background;
-    ctx.fillRect(0, 0, px, px);
-
-    const frontier =
-      phase === PHASE.EXPLORING && frames[exploreIndex - 1]
-        ? new Set(frames[exploreIndex - 1].frontier.map((p) => key(p[0], p[1])))
-        : new Set();
-    const revealed = new Set(path.slice(0, revealIndex).map((p) => key(p[0], p[1])));
-
-    for (let x = 0; x < cols; x++) {
-      for (let y = 0; y < cols; y++) {
-        const k = key(x, y);
-        if (exploredSet.has(k)) fill(x, y, colours.explored);
-        if (frontier.has(k)) fill(x, y, colours.frontier);
-        if (maze.grid[x][y] === WALL) fill(x, y, colours.wall);
-        if (revealed.has(k)) fill(x, y, colours.path);
-        if (maze.grid[x][y] === START) fill(x, y, colours.start);
-        if (maze.grid[x][y] === END) fill(x, y, colours.goal);
-      }
-    }
-
-    // current expansion marker, only while exploring
-    if (phase === PHASE.EXPLORING && frames[exploreIndex - 1]) {
-      const [cx, cy] = frames[exploreIndex - 1].current;
-      ctx.fillStyle = colours.current;
-      ctx.globalAlpha = 0.9;
-      ctx.fillRect(cx * cell, cy * cell, Math.ceil(cell), Math.ceil(cell));
+  function marker(x, y, cssColour, halo, cellPx) {
+    const cx = (x + 0.5) * cellPx;
+    const cy = (y + 0.5) * cellPx;
+    const r = Math.max(cellPx * 0.62, 5);
+    if (halo) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, r * 1.7, 0, Math.PI * 2);
+      ctx.strokeStyle = cssColour;
+      ctx.globalAlpha = 0.5;
+      ctx.lineWidth = Math.max(cellPx * 0.22, 2);
+      ctx.stroke();
       ctx.globalAlpha = 1;
     }
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, 0, Math.PI * 2);
+    ctx.fillStyle = cssColour;
+    ctx.fill();
+    ctx.lineWidth = Math.max(cellPx * 0.16, 1.5);
+    ctx.strokeStyle = "rgba(255,255,255,0.92)";
+    ctx.stroke();
   }
+  function draw() {
+    const px = canvas.clientWidth;
+    offCtx.putImageData(img, 0, 0);
+    ctx.imageSmoothingEnabled = false;
+    ctx.fillStyle = colours.css.background;
+    ctx.fillRect(0, 0, px, px);
+    ctx.drawImage(off, 0, 0, N, N, 0, 0, px, px);
 
+    const cellPx = px / N;
+    // current expansion head, while exploring
+    if (phase === PHASE.EXPLORING && closedShown > 0) {
+      const c = order[closedShown - 1];
+      const x = c % N;
+      const y = (c / N) | 0;
+      ctx.fillStyle = colours.css.current;
+      ctx.globalAlpha = 0.9;
+      const s = Math.max(cellPx, 3);
+      ctx.fillRect(x * cellPx + (cellPx - s) / 2, y * cellPx + (cellPx - s) / 2, s, s);
+      ctx.globalAlpha = 1;
+    }
+    marker(sx, sy, colours.css.start, false, cellPx);
+    marker(ex, ey, colours.css.goal, true, cellPx);
+  }
   function drawError(message) {
     try {
       const px = canvas.clientWidth || 320;
-      ctx.fillStyle = colours.background;
+      ctx.fillStyle = colours.css.background;
       ctx.fillRect(0, 0, px, px);
-      ctx.fillStyle = "#d55e00";
+      ctx.fillStyle = colours.css.goal;
       ctx.font = "14px system-ui, sans-serif";
       ctx.textAlign = "center";
       ctx.fillText("Visualiser failed to load", px / 2, px / 2 - 8);
-      ctx.fillStyle = colours.current;
+      ctx.fillStyle = colours.css.current;
       ctx.fillText(message || "Try reloading the page.", px / 2, px / 2 + 14);
     } catch {
-      /* last-resort: do nothing rather than throw */
+      /* never throw from the error path */
     }
   }
 
-  // ---- state reporting --------------------------------------------------
+  // ---- playback ---------------------------------------------------------
+  function advanceTo(s) {
+    s = Math.min(order.length, Math.max(0, s));
+    while (closedShown < s) {
+      paintCell(order[closedShown], colours.explored);
+      closedShown++;
+    }
+    while (openPtr < openOrder.length && openStep[openOrder[openPtr]] < s) {
+      const c = openOrder[openPtr];
+      if (closedAt[c] === -1 || closedAt[c] >= s) paintCell(c, colours.frontier);
+      openPtr++;
+    }
+    if (closedShown >= order.length) phase = found ? PHASE.REVEALING : PHASE.NO_PATH;
+  }
+  function advanceReveal(steps) {
+    const next = Math.min(path.length, revealIdx + steps);
+    for (let i = revealIdx; i < next; i++) paintCell(path[i], colours.path);
+    revealIdx = next;
+    if (revealIdx >= path.length) phase = PHASE.SOLVED;
+  }
+
+  function exploreStepsPerFrame() {
+    return Math.max(1, Math.round((order.length / 500) * speedSteps));
+  }
+  function revealStepsPerFrame() {
+    return Math.max(2, Math.ceil(path.length / 150));
+  }
+
+  function tick() {
+    if (phase === PHASE.EXPLORING) advanceTo(closedShown + exploreStepsPerFrame());
+    else if (phase === PHASE.REVEALING) advanceReveal(revealStepsPerFrame());
+  }
+
   function snapshot() {
     return {
       phase,
       running,
       found,
-      explored: exploredSet.size,
-      frontier:
-        phase === PHASE.EXPLORING && frames[exploreIndex - 1]
-          ? frames[exploreIndex - 1].frontier.length
-          : 0,
-      pathLength: path.length,
-      total: frames.length,
-      progress: frames.length ? exploreIndex / frames.length : 0,
+      explored: closedShown,
+      frontier: Math.max(0, openPtr - closedShown),
+      pathLength: path ? path.length : 0,
+      total: order ? order.length : 0,
+      progress: order && order.length ? closedShown / order.length : 0,
     };
   }
   function emit() {
     report(snapshot());
-  }
-
-  // ---- playback ---------------------------------------------------------
-  function advanceExplore(steps) {
-    for (let i = 0; i < steps && exploreIndex < frames.length; i++) {
-      exploredSet.add(key(frames[exploreIndex].current[0], frames[exploreIndex].current[1]));
-      exploreIndex++;
-    }
-    if (exploreIndex >= frames.length) {
-      phase = found ? PHASE.REVEALING : PHASE.NO_PATH;
-    }
-  }
-
-  function advanceReveal(steps) {
-    revealIndex = Math.min(path.length, revealIndex + steps);
-    if (revealIndex >= path.length) phase = PHASE.SOLVED;
-  }
-
-  function tick() {
-    if (phase === PHASE.EXPLORING) advanceExplore(speedSteps);
-    else if (phase === PHASE.REVEALING) advanceReveal(Math.max(1, Math.round(speedSteps / 2)));
   }
 
   function loop() {
@@ -215,8 +439,6 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
     tick();
     safeDraw();
     emit();
-    // Stop on any terminal state, including ERROR — otherwise a persistent
-    // draw failure would respin the frame loop indefinitely.
     if (phase === PHASE.SOLVED || phase === PHASE.NO_PATH || phase === PHASE.ERROR || errored) {
       running = false;
       rafId = null;
@@ -225,7 +447,6 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
     }
     rafId = requestAnimationFrame(loop);
   }
-
   function safeDraw() {
     try {
       draw();
@@ -236,11 +457,9 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
     }
   }
 
-  // ---- finishing instantly (reduced motion / "skip") --------------------
   function finishInstantly() {
-    for (const f of frames) exploredSet.add(key(f.current[0], f.current[1]));
-    exploreIndex = frames.length;
-    revealIndex = path.length;
+    advanceTo(order.length);
+    advanceReveal(path.length);
     phase = found ? PHASE.SOLVED : PHASE.NO_PATH;
     running = false;
     safeDraw();
@@ -255,7 +474,6 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
     emit();
     rafId = requestAnimationFrame(loop);
   }
-
   function pause() {
     if (!running) return;
     running = false;
@@ -263,27 +481,25 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
     rafId = null;
     emit();
   }
-
   function toggle() {
     running ? pause() : play();
   }
-
   function step() {
     if (errored) return;
     pause();
-    if (phase === PHASE.EXPLORING) advanceExplore(1);
+    if (phase === PHASE.EXPLORING) advanceTo(closedShown + 1);
     else if (phase === PHASE.REVEALING) advanceReveal(1);
     safeDraw();
     emit();
   }
-
-  function reset(autoplay) {
+  function resetPlayback(autoplay) {
     pause();
-    exploreIndex = 0;
-    revealIndex = 0;
-    exploredSet.clear();
+    closedShown = 0;
+    openPtr = 0;
+    revealIdx = 0;
     phase = PHASE.EXPLORING;
     errored = false;
+    paintBase();
     if (prefersReducedMotion()) {
       finishInstantly();
       return;
@@ -292,11 +508,13 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
     emit();
     if (autoplay) play();
   }
-
   function regenerate(opts) {
     const autoplay = !opts || opts.autoplay !== false;
     try {
-      precompute();
+      generate();
+      solve();
+      setupOffscreen();
+      layout();
     } catch (err) {
       errored = true;
       phase = PHASE.ERROR;
@@ -305,29 +523,37 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
       emit();
       return;
     }
-    reset(autoplay);
+    resetPlayback(autoplay);
   }
-
   function setSpeed(n) {
     speedSteps = clampSpeed(n);
   }
   function setSize(n) {
-    cols = oddify(n);
+    N = oddify(n);
     regenerate();
   }
   function refreshTheme() {
     colours = readColours(canvas);
+    // repaint base + already-revealed cells with the new palette
+    paintBase();
+    const shown = closedShown;
+    const op = openPtr;
+    const rev = revealIdx;
+    closedShown = 0;
+    openPtr = 0;
+    revealIdx = 0;
+    advanceTo(shown);
+    advanceReveal(rev);
+    openPtr = op;
     safeDraw();
   }
 
   const onResize = () => {
-    colours = readColours(canvas); // pick up any theme change too
+    colours = readColours(canvas);
     layout();
     safeDraw();
   };
   window.addEventListener("resize", onResize);
-
-  // Re-read the palette when the OS colour scheme flips (no resize needed).
   const schemeMq =
     typeof window.matchMedia === "function" ? window.matchMedia("(prefers-color-scheme: dark)") : null;
   const onScheme = () => refreshTheme();
@@ -341,7 +567,9 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
 
   // ---- bootstrap --------------------------------------------------------
   try {
-    precompute();
+    generate();
+    solve();
+    setupOffscreen();
     layout();
     if (prefersReducedMotion()) {
       finishInstantly();
@@ -362,7 +590,7 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
     pause,
     toggle,
     step,
-    reset: () => reset(false),
+    reset: () => resetPlayback(false),
     regenerate,
     setSpeed,
     setSize,
@@ -373,5 +601,3 @@ export function createSolver({ canvas, size = 41, speed = 6, onState }) {
     getPhase: () => phase,
   };
 }
-
-export { PHASE };

@@ -41,12 +41,17 @@ const repo = "https://github.com/lukesarfas/A-Star-Maze-Algorithm-Solver";
           <button class="btn" id="new" type="button">New maze</button>
           <span class="spacer"></span>
           <label for="size">Size
-            <select id="size" aria-label="Maze size">
-              <option value="21">21×21</option>
-              <option value="31">31×31</option>
-              <option value="41" selected>41×41</option>
-              <option value="51">51×51</option>
-            </select>
+            <input
+              id="size"
+              type="number"
+              min="11"
+              max="501"
+              step="2"
+              value="41"
+              inputmode="numeric"
+              aria-label="Maze size in cells per side, 11 to 501"
+            />
+            <span class="unit" aria-hidden="true">² up to 501</span>
           </label>
           <label for="speed">Speed
             <input id="speed" type="range" min="1" max="30" value="6" aria-label="Animation speed" />
@@ -121,17 +126,16 @@ const repo = "https://github.com/lukesarfas/A-Star-Maze-Algorithm-Solver";
         <div class="card">
           <h3>JavaScript · canvas</h3>
           <p>
-            A faithful, file-for-file port that runs here in the browser —
-            verified to produce the same path and node-expansion count as the
-            Python on identical mazes.
+            A faithful, file-for-file port in the repo — verified to produce the
+            same path and node-expansion count as the Python on identical mazes.
           </p>
         </div>
         <div class="card">
-          <h3>Same core</h3>
+          <h3>This live demo</h3>
           <p>
-            Both share one structure: <code>maze</code> generates,
-            <code>astar</code> searches a node at a time, <code>agent</code>
-            steps it forward, <code>main</code> renders.
+            Runs an optimised version of that algorithm — heap-based A* with a
+            scaled canvas renderer — so it stays smooth on custom mazes all the
+            way up to 501×501.
           </p>
         </div>
       </div>
