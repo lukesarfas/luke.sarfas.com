@@ -11,6 +11,6 @@
     "./MetaTags.astro": "./src/MetaTags.astro"
   },
   "dependencies": {
-    "@fontsource-variable/inter": "^5.2.8"
+    "@fontsource-variable/inter": "^5.3.0"
   }
 }
